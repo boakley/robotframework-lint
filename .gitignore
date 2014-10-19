@@ -1,5 +1,61 @@
-# Compiled
-*.elc
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
 
-# Packaging
-.cask
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+
+# Django stuff:
+*.log
+*.pot
+
+# Sphinx documentation
+docs/_build/
+
+# emacs crud
+\#*\#
+\.\#*
+*.elc
+*~
+
+# robot logs. 
+log.html
+report.html
+output.xml
+selenium-screenshot-*.png
+
+# mac crud
+.DS_Store
+
