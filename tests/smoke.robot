@@ -51,8 +51,6 @@
 | | [Documentation]
 | | ... | Run rflint against this test suite
 | | 
-| | [bogus] | bogus setting
-| | [another bogus setting] | another bogus setting
 | | Run rf-lint with the following options:
 | | ... | --format | {severity}: {linenumber}, {char}: {message} ({rulename})
 | | ... | --no-filenames
