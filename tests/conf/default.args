@@ -1,0 +1,9 @@
+# default arguments; any other argument files should include
+# this file. 
+--variable BROWSER:chrome
+--variable KEYWORD_DIR:tests/keywords
+
+# put all test results under the tests folder
+--outputdir tests/results
+
+--exclude in-progress
