@@ -24,6 +24,11 @@ Example:
 
     $ python -m rflint myTestSuite.robot
 
+To see a list of options, use the `--help` option:
+
+    $ python -m rflint --help
+
+
 Acknowledgements
 ================
 A huge thank-you to Echo Global Logistics (echo.com) for supporting the development of this package.
