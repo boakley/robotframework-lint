@@ -24,7 +24,7 @@ import argparse
 import imp
 
 from .common import SuiteRule, TestRule, KeywordRule, GeneralRule, Rule, ERROR, WARNING
-from parser import TxtParser
+from parser import RobotFile
 
 
 class RfLint(object):
@@ -64,7 +64,7 @@ class RfLint(object):
         for filename in self.args.args:
             if not (self.args.no_filenames):
                 print "+ "+filename
-            suite = TxtParser(filename)
+            suite = RobotFile(filename)
             for rule in self.suite_rules:
                 rule.apply(suite)
             for testcase in suite.testcases:

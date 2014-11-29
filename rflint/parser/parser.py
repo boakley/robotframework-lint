@@ -26,7 +26,7 @@ from testcase import Testcase
 from rfkeyword import Keyword
 from common import Row, Statement
 
-class TxtParser(object):
+class RobotFile(object):
     '''
     Terminology:
 
@@ -84,7 +84,7 @@ class TxtParser(object):
                     current_table.append(Row(linenumber, raw_text, cells))
 
     def __repr__(self):
-        return "<TxtParser(%s)>" % self.path
+        return "<RobotFile(%s)>" % self.path
 
     @property 
     def warnings(self):
@@ -224,7 +224,7 @@ if __name__ == "__main__":
 
     @timeit
     def test_mine():
-        suite = TxtParser(sys.argv[1])
+        suite = RobotFile(sys.argv[1])
         # force parsing of every line
         for tc in suite.testcases:
             statements = tc.statements
