@@ -45,7 +45,6 @@ class TxtParser(object):
         self.path = path
         self.tables = []
         self.rows = []
-        self.errors = []
 
         self._load(path)
 
@@ -205,23 +204,6 @@ def try_to_run_it(suite):
 
     for testcase in suite.testcases:
         import pdb; pdb.set_trace()
-
-class oldRow(object):
-    def __init__(self, linenumber, line, cells):
-        self.linenumber = linenumber
-        self.raw_text = line
-        self.cells = cells
-        self.raw = line
-
-    def dump(self):
-        print "|" + " | ".join([cell.strip() for cell in self.cells])
-    def __len__(self):
-        return len(self.cells)
-    def __getitem__(self, key):
-        return self.cells[key]
-    def __repr__(self):
-        return "line: %s cells: %s" % (self.linenumber, "| " + " | ".join(self.cells))
-
 
 if __name__ == "__main__":
     from robot.parsing import TestData, ResourceFile
