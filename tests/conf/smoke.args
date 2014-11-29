@@ -1,0 +1,3 @@
+--argumentfile tests/conf/default.args
+--include smoke
+./tests
