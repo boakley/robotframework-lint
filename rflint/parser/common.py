@@ -14,7 +14,7 @@ class Row(object):
     def __getitem__(self, key):
         return self.cells[key]
     def __repr__(self):
-        return "line: %s cells: %s" % (self.linenumber, "| " + " | ".join(self.cells))
+        return "<line: %s cells: %s>" % (self.linenumber, str(self.cells))
 
 class Comment(Row):
     # this isn't entirely correct or well thought out. 
