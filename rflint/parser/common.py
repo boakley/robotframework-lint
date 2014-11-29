@@ -11,6 +11,9 @@ class Row(object):
         print "|" + " | ".join([cell.strip() for cell in self.cells])
     def __len__(self):
         return len(self.cells)
+    def __setitem__(self, key, value):
+        self.cells[key] = value
+        return self.cells[key]
     def __getitem__(self, key):
         return self.cells[key]
     def __repr__(self):
