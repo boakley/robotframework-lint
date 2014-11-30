@@ -9,7 +9,8 @@ class Rule(object):
     rule_type = "general"
     output_format = "{severity}: {linenumber}, {char}: {message} ({rulename})"
 
-    def __init__(self, severity=None):
+    def __init__(self, controller, severity=None):
+        self.controller = controller
         if severity is not None:
             self.severity = severity
 
@@ -18,10 +19,11 @@ class Rule(object):
         return self.__class__.__name__
 
     def report(self, obj, message, linenum, char_offset=0):
-        print self.output_format.format(linenumber=linenum, filename=obj.path, 
-                                        severity=self.severity, message=message,
-                                        rulename = self.__class__.__name__,
-                                        char=char_offset)
+        '''Report an error or warning'''
+        self.controller.report(linenumber=linenum, filename=obj.path,
+                               severity=self.severity, message=message,
+                               rulename = self.__class__.__name__,
+                               char=char_offset)
 
     def __repr__(self):
         return "%s %s" % (self.severity, self.__class__.__name__)

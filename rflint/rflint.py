@@ -61,6 +61,7 @@ class RfLint(object):
                     [repr(x) for x in self.keyword_rules] + \
                     [repr(x) for x in self.general_rules] 
 
+        self.counts = { ERROR: 0, WARNING: 0, "other": 0}
         for filename in self.args.args:
             if not (self.args.no_filenames):
                 print "+ "+filename
@@ -74,6 +75,10 @@ class RfLint(object):
                 for rule in self.keyword_rules:
                     rule.apply(keyword)
 
+        if self.counts[ERROR] > 0:
+            sys.exit(self.counts[ERROR] if self.counts[ERROR] < 254 else 255)
+        sys.exit(0)
+
     def list_rules(self):
         """Print a list of all rules"""
         all_rules = [repr(x) for x in self.suite_rules] + \
@@ -84,6 +89,15 @@ class RfLint(object):
         print "\n".join(sorted([repr(x) for x in all_rules], 
                                key=lambda s: s[2:]))
 
+    def report(self, linenumber, filename, severity, message, rulename, char):
+        if severity in (WARNING, ERROR):
+            self.counts[severity] += 1
+        else:
+            self.counts["other"] += 1
+
+        print self.args.format.format(linenumber=linenumber, filename=filename, 
+                                      severity=severity, message=message,
+                                      rulename = rulename, char=char)
     def _get_rules(self, cls):
         """Returns a list of rules of a given class"""
         result = []
@@ -110,7 +124,7 @@ class RfLint(object):
 
             # create an instance of the rule, and add it
             # to the list of result
-            result.append(rule_class())
+            result.append(rule_class(self))
 
         return result
 
