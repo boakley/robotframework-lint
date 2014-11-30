@@ -5,6 +5,21 @@ def normalize_name(string):
     '''convert to lowercase, remove spaces and underscores'''
     return string.replace(" ", "").replace("_", "").lower()
 
+class DuplidateKeywordNames(SuiteRule):
+    '''Verify that no keywords have a name of an existing keyword in the same file'''
+    severity = ERROR
+
+    def apply(self, suite):
+        cache = []
+        for keyword in suite.keywords:
+            # normalize the name, so we catch things like
+            # Smoke Test vs Smoke_Test, vs SmokeTest, which
+            # robot thinks are all the same
+            name = normalize_name(keyword.name)
+            if name in cache:
+                self.report(suite, "Duplicate keyword name '%s'" % keyword.name, keyword.linenumber)
+            cache.append(name)
+
 class DuplicateTestNames(SuiteRule):
     '''Verify that no tests have a name of an existing test in the same suite'''
     severity = ERROR
@@ -17,7 +32,7 @@ class DuplicateTestNames(SuiteRule):
             # robot thinks are all the same
             name = normalize_name(testcase.name)
             if name in cache:
-                self.report(suite, "Duplicate testcase name",testcase.linenumber)
+                self.report(suite, "Duplicate testcase name '%s'" % testcase.name, testcase.linenumber)
             cache.append(name)
 
 class RequireSuiteDocumentation(SuiteRule):
