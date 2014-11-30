@@ -82,15 +82,26 @@
 | non-zero exit code on failure
 | | [Documentation]
 | | ... | Validates that exit code is non-zero if errors are present
+| | 
 | | [Setup] | Create a test suite | ${TEMPDIR}/busted.robot
 | | ... | *** Test Cases ***\n
 | | ... | An example test case\n
 | | ... | | # no documentation
 | | ... | | log | hello world
-| | Run rf-lint with the following options: | ${TEMPDIR}/busted.robot
+| | 
+| | Run rf-lint with the following options: 
+| | ... | --warn | RequireSuiteDocumentation
+| | ... | --error | RequireTestDocumentation
+| | ... | ${TEMPDIR}/busted.robot
+| | 
+| | # there should be two errors: no suite documentation, no testcase documentation
+| | # but the return code is only a count of the errors
 | | rflint return code should be | 1
 | | rflint should report 1 errors
-| | rflint should report 0 warnings
+| | rflint should report 1 warnings
+| | 
+| | [Teardown] | Run keyword if | ${result.rc} == 1 
+| | ... | Remove file | ${TEMPDIR}/busted.robot
 
 *** Keywords ***
 | Convert ${path} to ${format}
