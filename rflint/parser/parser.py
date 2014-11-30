@@ -11,7 +11,7 @@ Performance is pretty spiffy! At the time I write this (where
 admittedly I don't fully parse everything) it is about 3x-5x faster
 than the official robot parser. It can read a file with 500
 test cases and 500 keywords in about 30ms, compared to 150ms
-for the robot parser. Sweet.  Plenty good enough for robocop
+for the robot parser. Sweet.  
 
 '''
 
@@ -66,7 +66,11 @@ class RobotFile(object):
             matcher = Matcher(re.IGNORECASE)
             for linenumber, raw_text in enumerate(Utf8Reader(f).readlines()):
                 linenumber += 1; # start counting at 1 rather than zero
-                raw_text.replace(u'\xA0', ' ') # replace non-breaking space with space
+
+                # this mimics what the robot TSV reader does --
+                # it replaces non-breaking spaces with regular spaces,
+                # and strips trailing whitespace
+                raw_text.replace(u'\xA0', ' ')
                 raw_text = raw_text.rstrip()
 
                 # should I toss these, or add them to the suite?
@@ -162,10 +166,8 @@ def tableFactory(parent, linenumber, name):
     match = Matcher(re.IGNORECASE)
     if name is None:
         table = UnknownTable(parent, linenumber, name)
-    elif match(r'settings?', name):
+    elif match(r'settings?|metadata', name):
         table = SettingTable(parent, linenumber, name)
-    elif match(r'metadata', name):
-        table = MetadataTable(parent, linenumber, name)
     elif match(r'variables?', name):
         table = VariableTable(parent, linenumber, name)
     elif match(r'test( cases?)', name):
