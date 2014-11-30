@@ -20,6 +20,7 @@ import sys
 import os.path
 from robot.parsing.txtreader import TxtReader
 from robot.errors import DataError
+from robot.utils import Utf8Reader
 from util import timeit, Matcher
 from tables import *
 from testcase import Testcase
@@ -42,7 +43,7 @@ class RobotFile(object):
     def __init__(self, path, parent=None):
         self.parent = None
         self.name = os.path.splitext(os.path.basename(path))[0]
-        self.path = path
+        self.path = os.path.abspath(path)
         self.tables = []
         self.rows = []
 
@@ -61,17 +62,23 @@ class RobotFile(object):
         self.tables = []
         current_table = DefaultTable(self)
 
-        with open(path, "rU") as f:
+        with open(path, "rb") as f:
             matcher = Matcher(re.IGNORECASE)
-            for i, raw_text in enumerate(f.read().split("\n")):
-                linenumber = i+1
+            for linenumber, raw_text in enumerate(Utf8Reader(f).readlines()):
+                linenumber += 1; # start counting at 1 rather than zero
+                raw_text.replace(u'\xA0', ' ') # replace non-breaking space with space
+                raw_text = raw_text.rstrip()
+
                 # should I toss these, or add them to the suite?
+                # I can see someone wanting to write a rule that examines these
+                # comments. I'll wait until someone complains...
                 if raw_text.lstrip().startswith("#"): continue
 
                 # FIXME: I'm keeping line numbers but throwing away
                 # where each cell starts. I should be preserving that
                 # (though to be fair, robot is throwing that away so
-                # I'll have to write my own splitter)
+                # I'll have to write my own splitter if I want to save 
+                # the character position)
                 cells = TxtReader.split_row(raw_text)
                 _heading_regex = r'^\s*\*+\s*(.*?)[ *]*$'
 
