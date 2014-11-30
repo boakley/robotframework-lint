@@ -36,8 +36,11 @@
 | | 
 | | @{lines}= | Split to lines | ${result.stdout}
 | | ${actual}= | Get match count | ${lines} | regexp=^E:
+| | Run keyword if | ${actual} != ${expected}
+| | ... | log | ${result.stdout}
 | | Should be equal as numbers | ${expected} | ${actual}
 | | ... | Expected ${expected} errors but found ${actual}
+| | ... | values=False
 
 | rflint should report ${expected} warnings
 | | [Documentation]
