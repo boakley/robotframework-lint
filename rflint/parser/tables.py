@@ -72,7 +72,7 @@ class AbstractContainerTable(RobotTable):
                 # the first cell intact. Sorry if this ends up causing you grief
                 # some day...
                 row[0] = ""
-                self._children[-1].append(row.linenumber, row, row.cells)
+                self._children[-1].append(row.linenumber, row.raw_text, row.cells)
 
         elif len(self._children) == 0:
             # something before the first test case
@@ -83,6 +83,6 @@ class AbstractContainerTable(RobotTable):
         else:
             # another row for the testcase
             if len(row.cells) > 0:
-                self._children[-1].append(row.linenumber, row, row.cells)
+                self._children[-1].append(row.linenumber, row.raw_text, row.cells)
 
 
