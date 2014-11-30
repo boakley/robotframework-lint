@@ -79,6 +79,19 @@
 | | [Teardown] | Run keyword if | ${result.rc} == 0 
 | | ... | Remove file | ${TEMPDIR}/smoke.txt
 
+| non-zero exit code on failure
+| | [Documentation]
+| | ... | Validates that exit code is non-zero if errors are present
+| | [Setup] | Create a test suite | ${TEMPDIR}/busted.robot
+| | ... | *** Test Cases ***\n
+| | ... | An example test case\n
+| | ... | | # no documentation
+| | ... | | log | hello world
+| | Run rf-lint with the following options: | ${TEMPDIR}/busted.robot
+| | rflint return code should be | 1
+| | rflint should report 1 errors
+| | rflint should report 0 warnings
+
 *** Keywords ***
 | Convert ${path} to ${format}
 | | [Documentation]
