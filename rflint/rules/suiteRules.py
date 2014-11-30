@@ -1,11 +1,11 @@
-from rflint.common import SuiteRule, ERROR
+from rflint.common import SuiteRule, ERROR, WARNING
 from rflint.parser import SettingTable
 
 def normalize_name(string):
     '''convert to lowercase, remove spaces and underscores'''
     return string.replace(" ", "").replace("_", "").lower()
 
-class DuplidateKeywordNames(SuiteRule):
+class DuplicateKeywordNames(SuiteRule):
     '''Verify that no keywords have a name of an existing keyword in the same file'''
     severity = ERROR
 
@@ -37,7 +37,7 @@ class DuplicateTestNames(SuiteRule):
 
 class RequireSuiteDocumentation(SuiteRule):
     '''Verify that a test suite has documentation'''
-    severity=ERROR
+    severity=WARNING
 
     def apply(self, suite):
         for table in suite.tables:
