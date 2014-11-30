@@ -26,5 +26,5 @@ class RequireKeywordDocumentation(KeywordRule):
             if setting[1].lower() == "[documentation]" and len(setting) > 2:
                 return
 
-        # set the line number to the line immedately after the keyword name
+        # set the line number to the line immediately after the keyword name
         self.report(keyword, "No keyword documentation", keyword.linenumber+1)
