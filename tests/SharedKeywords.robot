@@ -18,6 +18,14 @@
 | | log | stdout: ${result.stdout} | DEBUG
 | | log | stderr: ${result.stderr} | DEBUG
 
+| rflint return code should be
+| | [Documentation]
+| | ... | Validate the return code of the most recent run of rflint
+| |
+| | [Arguments] | ${expected}
+| | Should be equal as integers | ${result.rc} | ${expected}
+| | ... | Expected a result code of ${expected} but got ${result.rc} 
+| | ... | values=False
 
 | rflint should report ${expected} errors
 | | [Documentation]
