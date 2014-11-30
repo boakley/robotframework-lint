@@ -19,7 +19,7 @@
 | | Run rf-lint with the following options:
 | | ... | --help
 | | 
-| | Should be equal as numbers | ${result.rc} | 0
+| | rflint return code should be | 0
 | | # instead of doing an exhaustive test, let's just make 
 | | # a quick spot-check
 | | Output should contain
@@ -42,7 +42,7 @@
 | | 
 | | Run rf-lint with the following options:
 | | ... | --list
-| | Should be equal as numbers | ${result.rc} | 0
+| | rflint return code should be | 0
 | | log | STDOUT:\n${result.stdout}
 | | log | STDERR:\n${result.stderr}
 
@@ -54,7 +54,7 @@
 | | ... | --format | {severity}: {linenumber}, {char}: {message} ({rulename})
 | | ... | --no-filenames
 | | ... | ${SUITE_SOURCE}
-| | Should be equal as numbers | ${result.rc} | 0
+| | rflint return code should be | 0
 | | rflint should report 0 errors
 | | rflint should report 0 warnings
 
@@ -62,18 +62,18 @@
 | | [Documentation]
 | | ... | Run rflint against this file in .tsv format
 | | [Setup] | Convert ${SUITE_SOURCE} to .tsv
-| | [Teardown] | Run keyword if | ${result.rc} == 0 | Remove file | ${TEMPDIR}/smoke.tsv
 | | Run rf-lint with the following options: | ${TEMPDIR}/smoke.tsv
-| | Should be equal as numbers | ${result.rc} | 0
+| | rflint return code should be | 0
 | | rflint should report 0 errors
 | | rflint should report 0 warnings
+| | [Teardown] | Run keyword if | ${result.rc} == 0 | Remove file | ${TEMPDIR}/smoke.tsv
 
 | smoke.txt (spaces, not pipes or tabs)
 | | [Documentation] 
 | | ... | Run rflint against this file in space separated format
 | | [Setup] | Convert ${SUITE_SOURCE} to .txt
 | | run rf-lint with the following options: | ${TEMPDIR}/smoke.txt
-| | Should be equal as numbers | ${result.rc} | 0
+| | rflint return code should be | 0
 | | rflint should report 0 errors
 | | rflint should report 0 warnings
 | | [Teardown] | Run keyword if | ${result.rc} == 0 
@@ -95,4 +95,3 @@
 | | ... | ${python} | -m | robot.tidy | ${SUITE_SOURCE} | ${outfile}
 | | log | saving file as ${outfile} | DEBUG
 | | [return] | ${result}
-
