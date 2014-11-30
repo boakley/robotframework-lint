@@ -118,28 +118,39 @@ class RfLint(object):
         """Handle the parsing of command line arguments."""
 
         parser = argparse.ArgumentParser(
+            prog="python -m rflint",
             description="A style checker for robot framework plain text files",
-            epilog="You can use 'all' in place of RuleName to refer to all rules. " + \
-                "For example: '--ignore all --warn DuplicateTestNames' will ignore all rules " + \
+            epilog = (
+                "You can use 'all' in place of <RuleName> to refer to all rules. "
+                "For example: '--ignore all --warn DuplicateTestNames' will ignore all rules "
                 "except DuplicateTestNames."
+                "  "
+                "FORMAT is a string that performs a substitution on the following "
+                "patterns: {severity}, {linenumber}, {char}, {message}, and {rulename}. "
+                "For example: --format 'line: {linenumber}: message: {message}'. "
+                )
             )
-        parser.add_argument("--error", "-e", metavar="RuleName", action="append")
-        parser.add_argument("--ignore", "-i", metavar="RuleName", action="append")
-        parser.add_argument("--warn", "-w", metavar="RuleName", action="append")
-        parser.add_argument("--list", "-l", action="store_true")
-        parser.add_argument("--no-filenames", action="store_true")
-        parser.add_argument("--format", "-f")
-        parser.add_argument('args', metavar="filenames", nargs=argparse.REMAINDER)
+        parser.add_argument("--error", "-e", metavar="<RuleName>", action="append",
+                            help="Assign a serverity of ERROR to the given RuleName")
+        parser.add_argument("--ignore", "-i", metavar="<RuleName>", action="append",
+                            help="Ignore the given RuleName")
+        parser.add_argument("--warn", "-w", metavar="<RuleName>", action="append",
+                            help="Assign a severity of WARNING for the given RuleName")
+        parser.add_argument("--list", "-l", action="store_true",
+                            help="show a list of known rules, then exit")
+        parser.add_argument("--no-filenames", action="store_true",
+                            help="supress the printing of filenames")
+        parser.add_argument("--format", "-f", 
+                            help="Define the output format",
+                            default='{severity}: {linenumber}, {char}: {message} ({rulename})')
+        parser.add_argument('args', metavar="<filenames>", nargs=argparse.REMAINDER)
 
         args = parser.parse_args(args)
         args.ignore = [rule.lower() for rule in args.ignore] if args.ignore else []
         args.warn = [rule.lower() for rule in args.warn] if args.warn else []
         args.error = [rule.lower() for rule in args.error] if args.error else []
 
-        output_format = "{severity}: {linenumber}, {char}: {message} ({rulename})"
-
-        if args.format is not None:
-            Rule.output_format = args.format
+        Rule.output_format = args.format
 
         return args
 

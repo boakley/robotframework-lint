@@ -26,9 +26,9 @@
 | | ... | usage:*
 | | ... | optional arguments:
 | | ... | *-h, --help*
-| | ... | *--error RuleName, -e RuleName*
-| | ... | *--ignore RuleName, -i RuleName*
-| | ... | *--warn RuleName, -w RuleName*
+| | ... | *--error <RuleName>, -e <RuleName>*
+| | ... | *--ignore <RuleName>, -i <RuleName>*
+| | ... | *--warn <RuleName>, -w <RuleName>*
 | | ... | *--list*
 | | ... | *--no-filenames*
 | | ... | *--format FORMAT, -f FORMAT*
