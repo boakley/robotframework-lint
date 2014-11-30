@@ -17,7 +17,7 @@ class DuplicateTestNames(SuiteRule):
             # robot thinks are all the same
             name = normalize_name(testcase.name)
             if name in cache:
-                self.report(suite, testcase.linenumber, "Duplicate testcase name")
+                self.report(suite, "Duplicate testcase name",testcase.linenumber)
             cache.append(name)
 
 class RequireSuiteDocumentation(SuiteRule):
@@ -38,5 +38,5 @@ class RequireSuiteDocumentation(SuiteRule):
                 linenum = table.linenumber + 1
                 break
 
-        self.report(suite, linenum, "No suite documentation")
+        self.report(suite, "No suite documentation", linenum)
             

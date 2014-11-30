@@ -17,7 +17,7 @@ class Rule(object):
     def name(self):
         return self.__class__.__name__
 
-    def report(self, obj, linenum, message, char_offset=0):
+    def report(self, obj, message, linenum, char_offset=0):
         print self.output_format.format(linenumber=linenum, filename=obj.path, 
                                         severity=self.severity, message=message,
                                         rulename = self.__class__.__name__,

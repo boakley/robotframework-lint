@@ -25,7 +25,7 @@ class TagWithSpaces(TestRule):
     def apply(self, testcase):
         for tag in testcase.tags:
             if ((" " in tag) or ("\t" in tag)):
-                self.report(testcase, testcase.linenumber, "space not allowed in tag name: '%s'" % tag)
+                self.report(testcase, "space not allowed in tag name: '%s'" % tag, testcase.linenumber)
 
 class RequireTestDocumentation(TestRule):
     '''Verify that a test suite has documentation'''
@@ -37,6 +37,6 @@ class RequireTestDocumentation(TestRule):
                 return
 
         # set the line number to the line immedately after the testcase name
-        self.report(testcase, testcase.linenumber+1, "No testcase documentation")
+        self.report(testcase, "No testcase documentation", testcase.linenumber+1)
 
             
