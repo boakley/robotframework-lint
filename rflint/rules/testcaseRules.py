@@ -36,7 +36,7 @@ class RequireTestDocumentation(TestRule):
             if setting[1].lower() == "[documentation]" and len(setting) > 2:
                 return
 
-        # set the line number to the line immedately after the testcase name
+        # set the line number to the line immediately after the testcase name
         self.report(testcase, "No testcase documentation", testcase.linenumber+1)
 
             
