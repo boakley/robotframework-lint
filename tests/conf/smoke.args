@@ -1,3 +1,4 @@
 --argumentfile tests/conf/default.args
 --include smoke
+--loglevel DEBUG
 ./tests
