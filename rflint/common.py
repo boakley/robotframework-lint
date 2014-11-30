@@ -6,7 +6,6 @@ WARNING="W"
 class Rule(object): 
     # default severity; subclasses may override
     severity = WARNING
-    rule_type = "general"
     output_format = "{severity}: {linenumber}, {char}: {message} ({rulename})"
 
     def __init__(self, controller, severity=None):
@@ -33,16 +32,27 @@ class TestRule(Rule):
 
     The object that is passed in will be of type rflint.parser.Testcase
     '''
-    rule_type = "test"
+    pass
 
 class SuiteRule(Rule): 
     '''Rule that runs against test cases. 
 
     The object that is passed in will be of type rflint.parser.Suite
     '''
-    rule_type = "suite"
+    pass
 class KeywordRule(Rule): 
-    rule_type = "keyword"
+    '''Rule that runs against keywords
+
+    The object that is passed in will be of type rflint.parser.Keyword
+    '''
+    pass
 class GeneralRule(Rule):
-    rule_type = "general"
+    '''Rule that requires a suite, but may apply to child objects
+
+    This rule is identical to a SuiteRule, but exists in case you want
+    to write a rule that accepts a suite but doesn't necessarily apply
+    to the suite (ie: you may iterate over tests, or keywords, or some
+    other child object)
+    '''
+    pass
 
