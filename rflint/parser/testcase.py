@@ -26,18 +26,15 @@ class Testcase(object):
         a misspelled or completely bogus setting, it'll return that too
         (eg: | | [Blockumentation] | hello, world)
         '''
-        settings = []
-        for statement in self.statements:
-            if len(statement) > 1 and re.match(r'\[.*?\]', statement[1]):
-                settings.append(statement)
-        return settings
+        return [statement for statement in self.statements if statement.is_setting()]
 
     @property
     def steps(self):
-        '''Return a list of steps (statements, but not settings)'''
+        '''Return a list of steps (statements that are not settings or comments)'''
         steps = []
         for statement in self.statements:
-            if len(statement) > 1 and not re.match(r'\[.*?\]', statement[1]):
+            if ((not statement.is_comment()) and 
+                (not statement.is_setting())):
                 steps.append(statement)
         return steps
 
