@@ -1,3 +1,4 @@
+import re
 # TODO: make Row and Statement more similar -- either
 # both should inherit from list, or neither should. 
 class Row(object):
@@ -30,6 +31,21 @@ class Statement(list):
     '''A Statement is a list of cells, plus some metadata'''
     startline = None
     endline = None
+
+    def is_setting(self):
+        if ((len(self) > 1) and
+            (re.match(r'\[.*?\]', self[1]))):
+            return True
+        return False
+
+    def is_comment(self):
+        '''Return True if the first non-empty cell starts with "#"'''
+        for cell in self[:]:
+            if cell == "":
+                continue
+            if cell.lstrip().startswith("#"):
+                return True
+        return False
 
     def __repr__(self):
         return "(%.4s-%.4s)%s" % (self.startline, self.endline, list.__repr__(self))
