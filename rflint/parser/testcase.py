@@ -64,8 +64,10 @@ class Testcase(object):
                 current_statement.endline = row.linenumber
             else:
                 if len(current_statement) > 0:
+                    # append current statement to the list of statements...
                     statements.append(current_statement)
-                current_statement = Statement(row.cells[1:])
+                # start a new statement
+                current_statement = Statement(row)
                 current_statement.startline = row.linenumber
                 current_statement.endline = row.linenumber
 
