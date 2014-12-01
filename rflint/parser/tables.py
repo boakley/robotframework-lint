@@ -49,15 +49,16 @@ class AbstractContainerTable(RobotTable):
     def append(self, row):
         ''' 
         The idea is, we recognize when we have a new testcase by 
-        checking the first cell. If it's not empty, we have a new
-        test case.
+        checking the first cell. If it's not empty and not a comment, 
+        we have a new test case.
 
         '''
         if len(row) == 0:
             # blank line. Should we throw it away, or append a BlankLine object?
             return
 
-        if row[0] != "":
+        if (row[0] != "" and 
+            (not row[0].lstrip().startswith("#"))):
             # we have a new child table
             self._children.append(self._childClass(self.parent, row.linenumber, row[0]))
             if len(row.cells) > 1:

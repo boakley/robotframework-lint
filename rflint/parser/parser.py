@@ -73,11 +73,6 @@ class RobotFile(object):
                 raw_text.replace(u'\xA0', ' ')
                 raw_text = raw_text.rstrip()
 
-                # should I toss these, or add them to the suite?
-                # I can see someone wanting to write a rule that examines these
-                # comments. I'll wait until someone complains...
-                if raw_text.lstrip().startswith("#"): continue
-
                 # FIXME: I'm keeping line numbers but throwing away
                 # where each cell starts. I should be preserving that
                 # (though to be fair, robot is throwing that away so
