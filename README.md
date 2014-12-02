@@ -28,6 +28,13 @@ To see a list of options, use the `--help` option:
 
     $ python -m rflint --help
 
+Example output:
+
+    $ python -m rflint myTestSuite.robot
+    + myTestSuite.robot
+    W: 2, 0: No suite documentation (RequireSuiteDocumentation)
+    E: 15, 0: No keyword documentation (RequireKeywordDocumentation)
+    
 
 Acknowledgements
 ================
