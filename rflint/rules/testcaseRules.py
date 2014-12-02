@@ -28,10 +28,16 @@ class TagWithSpaces(TestRule):
                 self.report(testcase, "space not allowed in tag name: '%s'" % tag, testcase.linenumber)
 
 class RequireTestDocumentation(TestRule):
-    '''Verify that a test suite has documentation'''
+    '''Verify that a test suite has documentation
+
+    This rule is not enforced for data driven tests ("Test Template" in Settings)
+    '''
     severity=ERROR
 
     def apply(self, testcase):
+        if testcase.is_templated:
+            return
+
         for setting in testcase.settings:
             if setting[1].lower() == "[documentation]" and len(setting) > 2:
                 return
