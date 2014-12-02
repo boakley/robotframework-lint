@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 
-from rflint.common import TestRule, ERROR
+from rflint.common import TestRule, ERROR, WARNING
 from rflint.parser import SettingTable
 
 
@@ -39,4 +39,20 @@ class RequireTestDocumentation(TestRule):
         # set the line number to the line immediately after the testcase name
         self.report(testcase, "No testcase documentation", testcase.linenumber+1)
 
-            
+class TooManyTestSteps(TestRule):
+    '''
+    Workflow tests should have no more than ten steps.
+
+    https://code.google.com/p/robotframework/wiki/HowToWriteGoodTestCases#Workflow_tests
+    
+    '''
+    severity=WARNING
+
+    def apply(self, testcase):
+        # ignore this rule for templated (data-driven) test cases
+        for setting in testcase.settings:
+            if setting[1].lower() == "[template]":
+                return
+        steps = list(testcase.steps)
+        if len(steps) > 10:
+            self.report(testcase, "Too many steps (%s) in test case" % len(steps), testcase.linenumber)
