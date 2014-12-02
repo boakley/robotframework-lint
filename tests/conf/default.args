@@ -7,3 +7,7 @@
 --outputdir tests/results
 
 --exclude in-progress
+# tests tagged with "test-data" are files used as 
+# inputs for some of the tests. We don't want to run
+# them as actual tests
+--exclude test-data 
