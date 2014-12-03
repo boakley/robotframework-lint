@@ -24,6 +24,7 @@ import argparse
 import imp
 
 from .common import SuiteRule, TestRule, KeywordRule, GeneralRule, Rule, ERROR, WARNING
+from version import __version__
 from parser import RobotFile
 
 
@@ -47,6 +48,10 @@ class RfLint(object):
 
         self.args = self.parse_and_process_args(args)
 
+        if self.args.version:
+            print __version__
+            sys.exit(0)
+            
         self.suite_rules = self._get_rules(SuiteRule)
         self.testcase_rules = self._get_rules(TestRule)
         self.keyword_rules = self._get_rules(KeywordRule)
@@ -157,6 +162,8 @@ class RfLint(object):
         parser.add_argument("--format", "-f", 
                             help="Define the output format",
                             default='{severity}: {linenumber}, {char}: {message} ({rulename})')
+        parser.add_argument("--version", action="store_true", default=False,
+                            help="Display version number and exit")
         parser.add_argument('args', metavar="<filenames>", nargs=argparse.REMAINDER)
 
         args = parser.parse_args(args)
