@@ -2,6 +2,7 @@
 | Documentation | Common keywords used by all the tests
 | Library | String
 | Library | Collections
+| Library | Process
 
 *** Keywords ***
 | Run rf-lint with the following options:
@@ -13,7 +14,10 @@
 | | ... | variable named \${output}
 | | 
 | | ${python}= | Evaluate | sys.executable | sys | # use same python used to run the tests
-| | ${result}= | Run process | ${python} | -m | rflint | @{options}
+| | ${result}= | Run process | ${python} | -m | rflint | 
+| | ... | # Define a specific format for all messages (but can be overridden)
+| | ... | --format | {severity}: {linenumber}, {char}: {message} ({rulename})
+| | ... | @{options}
 | | Set test variable | ${result}
 | | log | stdout: ${result.stdout} | DEBUG
 | | log | stderr: ${result.stderr} | DEBUG
