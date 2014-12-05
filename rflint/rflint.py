@@ -67,7 +67,11 @@ class RfLint(object):
                     [repr(x) for x in self.general_rules] 
 
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
+            
         for filename in self.args.args:
+            if not (os.path.exists(filename)):
+                sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
+                continue
             if not (self.args.no_filenames):
                 print "+ "+filename
             suite = RobotFile(filename)
