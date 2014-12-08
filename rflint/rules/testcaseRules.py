@@ -14,9 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 
-from rflint.common import TestRule, ERROR
+from rflint.common import TestRule, ERROR, WARNING
 from rflint.parser import SettingTable
 
+
+class PeriodInTestName(TestRule):
+    '''Warn about periods in the testcase name
+    
+    Since robot uses "." as a path separator, using a "." in a testcase
+    name can lead to ambiguity. 
+    '''
+    severity = WARNING
+    
+    def apply(self,testcase):
+        if "." in testcase.name:
+            self.report(testcase, "'.' in testcase name '%s'" % testcase.name, testcase.linenumber)
 
 class TagWithSpaces(TestRule):
     '''Flags tags that have spaces in the tag name'''

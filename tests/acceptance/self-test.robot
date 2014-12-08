@@ -18,6 +18,7 @@
 | tests/acceptance/rules/InvalidTable.robot              | 0
 | tests/acceptance/rules/DuplicateKeywordNames.robot     | 0
 | tests/acceptance/rules/PeriodInSuiteName.robot         | 0
+| tests/acceptance/rules/PeriodInTestName.robot          | 0
 
 *** Keywords ***
 | Run rflint and verify there are no errors or warnings
@@ -30,6 +31,9 @@
 | | Run rf-lint with the following options:
 | | ... | --no-filename
 | | ... | --format | {severity}: {linenumber}, {char}: {message} ({rulename})
+| | ... | # because the test cases reference filenames, they all have
+| | ... | # periods in their name...
+| | ... | --ignore | PeriodInTestName
 | | ... | ${test name}
 | | 
 | | @{messages}= | Split to lines | ${result.stdout}
