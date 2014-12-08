@@ -17,6 +17,7 @@
 | tests/unit/UnitTestResources.robot                     | 0
 | tests/acceptance/rules/InvalidTable.robot              | 0
 | tests/acceptance/rules/DuplicateKeywordNames.robot     | 0
+| tests/acceptance/rules/PeriodInSuiteName.robot         | 0
 
 *** Keywords ***
 | Run rflint and verify there are no errors or warnings
