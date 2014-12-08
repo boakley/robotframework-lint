@@ -27,6 +27,24 @@ from testcase import Testcase
 from rfkeyword import Keyword
 from common import Row, Statement
 
+def RobotFileFactory(path, parent=None):
+    '''Return an instance of SuiteFile or ResourceFile
+
+    Exactly which is returned depends on the contents of the
+    file. If there is a testcase table, this will return an
+    instance of SuiteFile, otherwise it will return an
+    instance of ResourceFile.
+    '''
+    rf = RobotFile(path, parent)
+
+    for table in rf.tables:
+        if isinstance(table, TestcaseTable):
+            rf.__class__ = SuiteFile
+            return rf
+
+    rf.__class__ = ResourceFile
+    return rf
+    
 class RobotFile(object):
     '''
     Terminology:
@@ -48,6 +66,7 @@ class RobotFile(object):
         self.rows = []
 
         self._load(path)
+
 
     def _load(self, path):
 
@@ -174,6 +193,14 @@ def tableFactory(parent, linenumber, name):
 
     return table
 
+
+class SuiteFile(RobotFile):
+    def __repr__(self):
+        return "<SuiteFile(%s)>" % self.path
+
+class ResourceFile(RobotFile):
+    def __repr__(self):
+        return "<ResourceFile(%s)>" % self.path
 
 class TestcaseTable(AbstractContainerTable):
     _childClass = Testcase

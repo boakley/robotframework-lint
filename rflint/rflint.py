@@ -25,7 +25,7 @@ import imp
 
 from .common import SuiteRule, TestRule, KeywordRule, GeneralRule, Rule, ERROR, WARNING
 from version import __version__
-from parser import RobotFile
+from parser import RobotFileFactory
 
 
 class RfLint(object):
@@ -76,7 +76,7 @@ class RfLint(object):
                 continue
             if not (self.args.no_filenames):
                 print "+ "+filename
-            suite = RobotFile(filename)
+            suite = RobotFileFactory(filename)
             for rule in self.suite_rules:
                 rule.apply(suite)
             for testcase in suite.testcases:
