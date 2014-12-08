@@ -39,9 +39,7 @@ class RfLint(object):
             for filename in glob.glob(path+"/*.py"):
                 if filename.endswith(".__init__.py"):
                     continue
-                basename = os.path.basename(filename)
-                (name, ext) = os.path.splitext(basename)
-                imp.load_source(name, filename)
+                self._load_rule_file(filename)
 
     def run(self, args):
         """Parse command line arguments, and run rflint"""
@@ -52,6 +50,10 @@ class RfLint(object):
             print __version__
             sys.exit(0)
             
+        if self.args.rulefile:
+            for filename in self.args.rulefile:
+                self._load_rule_file(filename)
+
         self.suite_rules = self._get_rules(SuiteRule)
         self.testcase_rules = self._get_rules(TestRule)
         self.keyword_rules = self._get_rules(KeywordRule)
@@ -137,6 +139,18 @@ class RfLint(object):
 
         return result
 
+    def _load_rule_file(self, filename):
+        '''Import the given rule file'''
+        if not (os.path.exists(filename)):
+            sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
+            return
+        try:
+            basename = os.path.basename(filename)
+            (name, ext) = os.path.splitext(basename)
+            imp.load_source(name, filename)
+        except Exception as e:
+            sys.stderr.write("rflint: %s: exception while loading: %s\n" % (filename, str(e)))
+
     def parse_and_process_args(self, args):
         """Handle the parsing of command line arguments."""
 
@@ -168,6 +182,8 @@ class RfLint(object):
                             default='{severity}: {linenumber}, {char}: {message} ({rulename})')
         parser.add_argument("--version", action="store_true", default=False,
                             help="Display version number and exit")
+        parser.add_argument("--rulefile", "-R", action="append",
+                            help="import additional rules from the given RULEFILE")
         parser.add_argument('args', metavar="<filenames>", nargs=argparse.REMAINDER)
 
         args = parser.parse_args(args)

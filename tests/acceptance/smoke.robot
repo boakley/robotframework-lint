@@ -30,6 +30,7 @@
 | | ... | *--ignore <RuleName>, -i <RuleName>*
 | | ... | *--warn <RuleName>, -w <RuleName>*
 | | ... | *--list*
+| | ... | *--rulefile RULEFILE, -R RULEFILE
 | | ... | *--no-filenames*
 | | ... | *--format FORMAT, -f FORMAT*
 
