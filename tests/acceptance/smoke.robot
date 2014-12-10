@@ -7,6 +7,12 @@
 | Library    | SharedKeywords.py
 | Resource   | SharedKeywords.robot
 | Force Tags | smoke
+| #
+| Test Teardown 
+| ... | # provide some debugging information if things go bad
+| ... | Run keyword if | "${TEST STATUS}" == "FAIL"
+| ... | log | ${result.stdout}\n${result.stderr}
+
 
 *** Test Cases ***
 | Command line help 
@@ -30,6 +36,7 @@
 | | ... | *--ignore <RuleName>, -i <RuleName>*
 | | ... | *--warn <RuleName>, -w <RuleName>*
 | | ... | *--list*
+| | ... | *--rulefile RULEFILE, -R RULEFILE
 | | ... | *--no-filenames*
 | | ... | *--format FORMAT, -f FORMAT*
 
@@ -46,7 +53,7 @@
 | | log | STDOUT:\n${result.stdout}
 | | log | STDERR:\n${result.stderr}
 
-| rflint smoke.robot
+| rflint this file
 | | [Documentation]
 | | ... | Run rflint against this test suite
 | | 
@@ -58,7 +65,7 @@
 | | rflint should report 0 errors
 | | rflint should report 0 warnings
 
-| smoke.tsv
+| this file, converted to TSV
 | | [Documentation]
 | | ... | Run rflint against this file in .tsv format
 | | [Setup] | Convert ${SUITE_SOURCE} to .tsv
@@ -68,7 +75,7 @@
 | | rflint should report 0 warnings
 | | [Teardown] | Run keyword if | ${result.rc} == 0 | Remove file | ${TEMPDIR}/smoke.tsv
 
-| smoke.txt (spaces, not pipes or tabs)
+| this file, converted to space-separated format
 | | [Documentation] 
 | | ... | Run rflint against this file in space separated format
 | | [Setup] | Convert ${SUITE_SOURCE} to .txt

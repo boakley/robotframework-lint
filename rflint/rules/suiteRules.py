@@ -1,9 +1,33 @@
 from rflint.common import SuiteRule, ERROR, WARNING
 from rflint.parser import SettingTable
+import re
 
 def normalize_name(string):
     '''convert to lowercase, remove spaces and underscores'''
     return string.replace(" ", "").replace("_", "").lower()
+
+class PeriodInSuiteName(SuiteRule):
+    '''Warn about periods in the suite name
+    
+    Since robot uses "." as a path separator, using a "." in a suite
+    name can lead to ambiguity. 
+    '''
+    severity = WARNING
+    
+    def apply(self,suite):
+        if "." in suite.name:
+            self.report(suite, "'.' in suite name '%s'" % suite.name, 0)
+
+class InvalidTable(SuiteRule):
+    '''Verify that there are no invalid table headers'''
+    severity = WARNING
+
+    def apply(self, suite):
+        for table in suite.tables:
+            if (not re.match(r'settings?|metadata|(test )?cases?|(user )?keywords?|variables?', 
+                             table.name, re.IGNORECASE)):
+                self.report(suite, "Unknown table name '%s'" % table.name, table.linenumber)
+
 
 class DuplicateKeywordNames(SuiteRule):
     '''Verify that no keywords have a name of an existing keyword in the same file'''
