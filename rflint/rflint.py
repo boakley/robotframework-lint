@@ -193,6 +193,25 @@ class RfLint(object):
 
         Rule.output_format = args.format
 
+        args.args = self.process_paths_to_filenames(args.args)
+
         return args
 
-        
+    def process_paths_to_filenames(self, paths):
+        """Return a list of all robot files in the provided list of paths.
+
+        If any of the paths are directories, recursively find all robot files
+        within those directories.
+        """
+        filenames = set()
+        for path in paths:
+            if os.path.isfile(path):
+                filenames.add(path)
+                continue
+            elif os.path.isdir(path):
+                for root, dirs, files in os.walk(path):
+                    for filename in files:
+                        if filename.lower().strip().endswith('.robot'):
+                            filenames.add(os.path.join(root, filename))
+        return sorted(list(filenames))
+
