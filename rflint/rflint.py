@@ -24,7 +24,8 @@ import argparse
 import imp
 
 from .common import SuiteRule, TestRule, KeywordRule, GeneralRule, Rule, ERROR, WARNING
-from parser import RobotFile
+from version import __version__
+from parser import RobotFileFactory
 
 
 class RfLint(object):
@@ -38,14 +39,20 @@ class RfLint(object):
             for filename in glob.glob(path+"/*.py"):
                 if filename.endswith(".__init__.py"):
                     continue
-                basename = os.path.basename(filename)
-                (name, ext) = os.path.splitext(basename)
-                imp.load_source(name, filename)
+                self._load_rule_file(filename)
 
     def run(self, args):
         """Parse command line arguments, and run rflint"""
 
         self.args = self.parse_and_process_args(args)
+
+        if self.args.version:
+            print __version__
+            sys.exit(0)
+            
+        if self.args.rulefile:
+            for filename in self.args.rulefile:
+                self._load_rule_file(filename)
 
         self.suite_rules = self._get_rules(SuiteRule)
         self.testcase_rules = self._get_rules(TestRule)
@@ -62,10 +69,14 @@ class RfLint(object):
                     [repr(x) for x in self.general_rules] 
 
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
+            
         for filename in self.args.args:
+            if not (os.path.exists(filename)):
+                sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
+                continue
             if not (self.args.no_filenames):
                 print "+ "+filename
-            suite = RobotFile(filename)
+            suite = RobotFileFactory(filename)
             for rule in self.suite_rules:
                 rule.apply(suite)
             for testcase in suite.testcases:
@@ -128,6 +139,18 @@ class RfLint(object):
 
         return result
 
+    def _load_rule_file(self, filename):
+        '''Import the given rule file'''
+        if not (os.path.exists(filename)):
+            sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
+            return
+        try:
+            basename = os.path.basename(filename)
+            (name, ext) = os.path.splitext(basename)
+            imp.load_source(name, filename)
+        except Exception as e:
+            sys.stderr.write("rflint: %s: exception while loading: %s\n" % (filename, str(e)))
+
     def parse_and_process_args(self, args):
         """Handle the parsing of command line arguments."""
 
@@ -145,7 +168,7 @@ class RfLint(object):
                 )
             )
         parser.add_argument("--error", "-e", metavar="<RuleName>", action="append",
-                            help="Assign a serverity of ERROR to the given RuleName")
+                            help="Assign a severity of ERROR to the given RuleName")
         parser.add_argument("--ignore", "-i", metavar="<RuleName>", action="append",
                             help="Ignore the given RuleName")
         parser.add_argument("--warn", "-w", metavar="<RuleName>", action="append",
@@ -153,10 +176,14 @@ class RfLint(object):
         parser.add_argument("--list", "-l", action="store_true",
                             help="show a list of known rules, then exit")
         parser.add_argument("--no-filenames", action="store_true",
-                            help="supress the printing of filenames")
+                            help="suppress the printing of filenames")
         parser.add_argument("--format", "-f", 
                             help="Define the output format",
                             default='{severity}: {linenumber}, {char}: {message} ({rulename})')
+        parser.add_argument("--version", action="store_true", default=False,
+                            help="Display version number and exit")
+        parser.add_argument("--rulefile", "-R", action="append",
+                            help="import additional rules from the given RULEFILE")
         parser.add_argument('args', metavar="<filenames>", nargs=argparse.REMAINDER)
 
         args = parser.parse_args(args)

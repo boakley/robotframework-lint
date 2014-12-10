@@ -18,6 +18,18 @@ from rflint.common import TestRule, ERROR, WARNING
 from rflint.parser import SettingTable
 
 
+class PeriodInTestName(TestRule):
+    '''Warn about periods in the testcase name
+    
+    Since robot uses "." as a path separator, using a "." in a testcase
+    name can lead to ambiguity. 
+    '''
+    severity = WARNING
+    
+    def apply(self,testcase):
+        if "." in testcase.name:
+            self.report(testcase, "'.' in testcase name '%s'" % testcase.name, testcase.linenumber)
+
 class TagWithSpaces(TestRule):
     '''Flags tags that have spaces in the tag name'''
     severity=ERROR
@@ -28,10 +40,16 @@ class TagWithSpaces(TestRule):
                 self.report(testcase, "space not allowed in tag name: '%s'" % tag, testcase.linenumber)
 
 class RequireTestDocumentation(TestRule):
-    '''Verify that a test suite has documentation'''
+    '''Verify that a test suite has documentation
+
+    This rule is not enforced for data driven tests ("Test Template" in Settings)
+    '''
     severity=ERROR
 
     def apply(self, testcase):
+        if testcase.is_templated:
+            return
+
         for setting in testcase.settings:
             if setting[1].lower() == "[documentation]" and len(setting) > 2:
                 return

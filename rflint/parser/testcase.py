@@ -1,3 +1,4 @@
+from tables import SettingTable
 from common import Row, Statement
 import re
 
@@ -11,6 +12,16 @@ class Testcase(object):
     def append(self, linenumber, raw_text, cells):
         """Add another row of data from a test suite"""
         self.rows.append(Row(linenumber, raw_text, cells))
+
+    @property 
+    def is_templated(self):
+        """Return True if the test is part of a suite that uses a Test Template"""
+        for table in self.parent.tables:
+            if isinstance(table, SettingTable):
+                for row in table.rows:
+                    if row[0].lower() == "test template":
+                        return True
+        return False
 
     @property
     def path(self):
