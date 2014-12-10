@@ -184,6 +184,8 @@ class RfLint(object):
                             help="Display version number and exit")
         parser.add_argument("--rulefile", "-R", action="append",
                             help="import additional rules from the given RULEFILE")
+        parser.add_argument("--recursive", "-r", action="store_true",
+                            help="Run on directories recursively")
         parser.add_argument('args', metavar="<filenames>", nargs=argparse.REMAINDER)
 
         args = parser.parse_args(args)
@@ -193,15 +195,15 @@ class RfLint(object):
 
         Rule.output_format = args.format
 
-        args.args = self.process_paths_to_filenames(args.args)
+        args.args = self.process_paths_to_filenames(args.args, args.recursive)
 
         return args
 
-    def process_paths_to_filenames(self, paths):
+    def process_paths_to_filenames(self, paths, recursive=False):
         """Return a list of all robot files in the provided list of paths.
 
-        If any of the paths are directories, recursively find all robot files
-        within those directories.
+        If any of the paths are directories, find all robot files
+        within those directories. Optionally, run recursively on directories.
         """
         filenames = set()
         for path in paths:
@@ -209,9 +211,16 @@ class RfLint(object):
                 filenames.add(path)
                 continue
             elif os.path.isdir(path):
-                for root, dirs, files in os.walk(path):
-                    for filename in files:
-                        if filename.lower().strip().endswith('.robot'):
-                            filenames.add(os.path.join(root, filename))
+                if recursive:
+                    for root, dirs, files in os.walk(path):
+                        for filename in files:
+                            if filename.lower().endswith('.robot'):
+                                filenames.add(os.path.join(root, filename))
+                else:
+                    for entry in os.listdir(path):
+                        entry_path = os.path.join(path, entry)
+                        if (os.path.isfile(entry_path)
+                                and entry.lower().endswith('.robot')):
+                            filenames.add(entry_path)
         return sorted(list(filenames))
 
