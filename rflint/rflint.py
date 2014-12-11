@@ -168,7 +168,7 @@ class RfLint(object):
                 )
             )
         parser.add_argument("--error", "-e", metavar="<RuleName>", action="append",
-                            help="Assign a serverity of ERROR to the given RuleName")
+                            help="Assign a severity of ERROR to the given RuleName")
         parser.add_argument("--ignore", "-i", metavar="<RuleName>", action="append",
                             help="Ignore the given RuleName")
         parser.add_argument("--warn", "-w", metavar="<RuleName>", action="append",
@@ -176,7 +176,7 @@ class RfLint(object):
         parser.add_argument("--list", "-l", action="store_true",
                             help="show a list of known rules, then exit")
         parser.add_argument("--no-filenames", action="store_true",
-                            help="supress the printing of filenames")
+                            help="suppress the printing of filenames")
         parser.add_argument("--format", "-f", 
                             help="Define the output format",
                             default='{severity}: {linenumber}, {char}: {message} ({rulename})')
