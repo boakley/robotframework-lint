@@ -89,7 +89,7 @@ class RobotFile(object):
                 # this mimics what the robot TSV reader does --
                 # it replaces non-breaking spaces with regular spaces,
                 # and strips trailing whitespace
-                raw_text.replace(u'\xA0', ' ')
+                raw_text = raw_text.replace(u'\xA0', ' ')
                 raw_text = raw_text.rstrip()
 
                 # FIXME: I'm keeping line numbers but throwing away
