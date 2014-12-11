@@ -22,6 +22,7 @@ import sys
 import glob
 import argparse
 import imp
+import re
 
 from .common import SuiteRule, TestRule, KeywordRule, GeneralRule, Rule, ERROR, WARNING
 from version import __version__
@@ -70,13 +71,13 @@ class RfLint(object):
 
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
             
-        for filename in self.args.args:
-            if not (os.path.exists(filename)):
-                sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
+        for suite in self.args.suites:
+            if not (os.path.exists(suite.path)):
+                sys.stderr.write("rflint: %s: No such file or directory\n" % suite.path)
                 continue
             if not (self.args.no_filenames):
-                print "+ "+filename
-            suite = RobotFileFactory(filename)
+                print "+ "+ suite.path
+            #suite = RobotFileFactory(filename)
             for rule in self.suite_rules:
                 rule.apply(suite)
             for testcase in suite.testcases:
@@ -195,7 +196,7 @@ class RfLint(object):
 
         Rule.output_format = args.format
 
-        args.args = self.process_paths_to_filenames(args.args, args.recursive)
+        args.suites = self.process_paths_to_suites(args.args, args.recursive).values()
 
         return args
 
@@ -206,28 +207,37 @@ class RfLint(object):
             if path.lower().endswith(extension):
                 return True
 
-    def process_paths_to_filenames(self, paths, recursive=False):
+    def process_paths_to_suites(self, paths, recursive=False):
         """Return a list of all robot files in the provided list of paths.
 
         If any of the paths are directories, find all robot files
         within those directories. Optionally, run recursively on directories.
         """
-        filenames = set()
+        suites = dict()
         for path in paths:
             if os.path.isfile(path):
-                filenames.add(path)
+                suite = RobotFileFactory(path)
+                suites[suite.path] = suite
                 continue
             elif os.path.isdir(path):
                 if recursive:
                     for root, dirs, files in os.walk(path):
                         for filename in files:
                             if self.has_robot_extension(filename):
-                                filenames.add(os.path.join(root, filename))
+                                suite = RobotFileFactory(os.path.join(root, filename))
+                                for table in suite.tables:
+                                    if re.match(r'settings?|metadata|(test )?cases?|(user )?keywords?|variables?', table.name, re.IGNORECASE):
+                                        suites[suite.path] = suite
+                                        break
                 else:
                     for entry in os.listdir(path):
                         entry_path = os.path.join(path, entry)
                         if (os.path.isfile(entry_path)
                                 and self.has_robot_extension(entry)):
-                            filenames.add(entry_path)
-        return sorted(list(filenames))
+                            suite = RobotFileFactory(entry_path)
+                            for table in suite.tables:
+                                if re.match(r'settings?|metadata|(test )?cases?|(user )?keywords?|variables?', table.name, re.IGNORECASE):
+                                    suites[suite.path] = suite
+                                    break
+        return suites
 
