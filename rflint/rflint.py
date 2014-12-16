@@ -23,10 +23,12 @@ import glob
 import argparse
 import imp
 
-from .common import SuiteRule, TestRule, KeywordRule, GeneralRule, Rule, ERROR, WARNING
+from .common import SuiteRule, TestRule, KeywordRule, GeneralRule, Rule
+from .common import ERROR, WARNING, IGNORE
 from version import __version__
 from parser import RobotFileFactory
 
+from robot.utils.argumentparser import ArgFileParser
 
 class RfLint(object):
     """Robot Framework Linter"""
@@ -44,6 +46,13 @@ class RfLint(object):
     def run(self, args):
         """Parse command line arguments, and run rflint"""
 
+        self.suite_rules = self._get_rules(SuiteRule)
+        self.testcase_rules = self._get_rules(TestRule)
+        self.keyword_rules = self._get_rules(KeywordRule)
+        self.general_rules = self._get_rules(GeneralRule)
+
+        self.all_rules = self.suite_rules + self.testcase_rules + self.keyword_rules + self.general_rules
+
         self.args = self.parse_and_process_args(args)
 
         if self.args.version:
@@ -54,20 +63,10 @@ class RfLint(object):
             for filename in self.args.rulefile:
                 self._load_rule_file(filename)
 
-        self.suite_rules = self._get_rules(SuiteRule)
-        self.testcase_rules = self._get_rules(TestRule)
-        self.keyword_rules = self._get_rules(KeywordRule)
-        self.general_rules = self._get_rules(GeneralRule)
-                
         if self.args.list:
             self.list_rules()
             sys.exit(0)
         
-        all_rules = [repr(x) for x in self.suite_rules] + \
-                    [repr(x) for x in self.testcase_rules] + \
-                    [repr(x) for x in self.keyword_rules] + \
-                    [repr(x) for x in self.general_rules] 
-
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
             
         for filename in self.args.args:
@@ -78,13 +77,16 @@ class RfLint(object):
                 print "+ "+filename
             suite = RobotFileFactory(filename)
             for rule in self.suite_rules:
-                rule.apply(suite)
+                if rule.severity != IGNORE:
+                    rule.apply(suite)
             for testcase in suite.testcases:
                 for rule in self.testcase_rules:
-                    rule.apply(testcase)
+                    if rule.severity != IGNORE:
+                        rule.apply(testcase)
             for keyword in suite.keywords:
                 for rule in self.keyword_rules:
-                    rule.apply(keyword)
+                    if rule.severity != IGNORE:
+                        rule.apply(keyword)
 
         if self.counts[ERROR] > 0:
             sys.exit(self.counts[ERROR] if self.counts[ERROR] < 254 else 255)
@@ -114,27 +116,6 @@ class RfLint(object):
         result = []
         for rule_class in cls.__subclasses__():
             rule_name = rule_class.__name__.lower()
-
-            if ("all" in self.args.ignore and
-                (rule_name not in self.args.warn and
-                 rule_name not in self.args.error)):
-                # if we are told to ignore all, skip this one unless
-                # it was explicitly added with --ignore or --warn
-                continue
-
-            if ((rule_name in self.args.ignore)):
-                # if the user asked this rule to be ignored, skip it
-                continue
-
-            # if the rule was an option to --warn or --error, update
-            # the rule's severity
-            if rule_name in self.args.warn:
-                rule_class.severity = WARNING
-            elif rule_name in self.args.error:
-                rule_class.severity = ERROR
-
-            # create an instance of the rule, and add it
-            # to the list of result
             result.append(rule_class(self))
 
         return result
@@ -167,11 +148,11 @@ class RfLint(object):
                 "For example: --format 'line: {linenumber}: message: {message}'. "
                 )
             )
-        parser.add_argument("--error", "-e", metavar="<RuleName>", action="append",
+        parser.add_argument("--error", "-e", metavar="<RuleName>", action=SetErrorAction,
                             help="Assign a severity of ERROR to the given RuleName")
-        parser.add_argument("--ignore", "-i", metavar="<RuleName>", action="append",
+        parser.add_argument("--ignore", "-i", metavar="<RuleName>", action=SetIgnoreAction,
                             help="Ignore the given RuleName")
-        parser.add_argument("--warn", "-w", metavar="<RuleName>", action="append",
+        parser.add_argument("--warning", "-w", metavar="<RuleName>", action=SetWarningAction,
                             help="Assign a severity of WARNING for the given RuleName")
         parser.add_argument("--list", "-l", action="store_true",
                             help="show a list of known rules, then exit")
@@ -184,15 +165,44 @@ class RfLint(object):
                             help="Display version number and exit")
         parser.add_argument("--rulefile", "-R", action="append",
                             help="import additional rules from the given RULEFILE")
+        parser.add_argument("--argumentfile", "-A", action=ArgfileLoader)
         parser.add_argument('args', metavar="<filenames>", nargs=argparse.REMAINDER)
 
-        args = parser.parse_args(args)
-        args.ignore = [rule.lower() for rule in args.ignore] if args.ignore else []
-        args.warn = [rule.lower() for rule in args.warn] if args.warn else []
-        args.error = [rule.lower() for rule in args.error] if args.error else []
+        # create a custom namespace, in which we can store a reference to
+        # our rules. This lets the custom argument actions access the list
+        # of rules
+        ns = argparse.Namespace()
+        setattr(ns, "_rules", self.all_rules)
+        args = parser.parse_args(args, ns)
 
         Rule.output_format = args.format
 
         return args
-
         
+class SetWarningAction(argparse.Action):
+    '''Called when the argument parser encounters --warning'''
+    def __call__(self, parser, namespace, rulename, option_string = None):
+        for rule in getattr(namespace, "_rules"):
+            if rulename == rule.name or rulename == "all":
+                rule.severity = WARNING
+
+class SetErrorAction(argparse.Action):
+    '''Called when the argument parser encounters --error'''
+    def __call__(self, parser, namespace, rulename, option_string = None):
+        for rule in getattr(namespace, "_rules"):
+            if rulename == rule.name or rulename == "all":
+                rule.severity = ERROR
+
+class SetIgnoreAction(argparse.Action):
+    '''Called when the argument parser encounters --ignore'''
+    def __call__(self, parser, namespace, rulename, option_string = None):
+        for rule in getattr(namespace, "_rules"):
+            if rulename == rule.name or rulename == "all":
+                rule.severity = IGNORE
+
+class ArgfileLoader(argparse.Action):
+    '''Called when the argument parser encounters --argumentfile'''
+    def __call__ (self, parser, namespace, values, option_string = None):
+        ap = ArgFileParser(["--argumentfile","-A"])
+        args = ap.process(["-A", values])
+        parser.parse_args(args, namespace)
