@@ -71,13 +71,13 @@ class RfLint(object):
 
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
             
-        for suite in self.args.suites:
+        for suite_path in sorted(self.args.suites):
+            suite = self.args.suites[suite_path]
             if not (os.path.exists(suite.path)):
                 sys.stderr.write("rflint: %s: No such file or directory\n" % suite.path)
                 continue
             if not (self.args.no_filenames):
                 print "+ "+ suite.path
-            #suite = RobotFileFactory(filename)
             for rule in self.suite_rules:
                 rule.apply(suite)
             for testcase in suite.testcases:
@@ -196,7 +196,7 @@ class RfLint(object):
 
         Rule.output_format = args.format
 
-        args.suites = self.process_paths_to_suites(args.args, args.recursive).values()
+        args.suites = self.process_paths_to_suites(args.args, args.recursive)
 
         return args
 
