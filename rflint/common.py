@@ -1,7 +1,9 @@
 import rflint
+import sys
 
 ERROR="E"
 WARNING="W"
+IGNORE="I"
 
 class Rule(object): 
     # default severity; subclasses may override
@@ -23,6 +25,36 @@ class Rule(object):
                                severity=self.severity, message=message,
                                rulename = self.__class__.__name__,
                                char=char_offset)
+
+    @property
+    def doc(self):
+        '''Algorithm from https://www.python.org/dev/peps/pep-0257/'''
+        if not self.__doc__:
+            return ""
+
+        lines = self.__doc__.expandtabs().splitlines()
+
+        # Determine minimum indentation (first line doesn't count):
+        indent = sys.maxint
+        for line in lines[1:]:
+            stripped = line.lstrip()
+            if stripped:
+                indent = min(indent, len(line) - len(stripped))
+
+        # Remove indentation (first line is special):
+        trimmed = [lines[0].strip()]
+        if indent < sys.maxint:
+            for line in lines[1:]:
+                trimmed.append(line[indent:].rstrip())
+
+        # Strip off trailing and leading blank lines:
+        while trimmed and not trimmed[-1]:
+            trimmed.pop()
+        while trimmed and not trimmed[0]:
+            trimmed.pop(0)
+
+        # Return a single string:
+        return '\n'.join(trimmed)
 
     def __repr__(self):
         return "%s %s" % (self.severity, self.__class__.__name__)

@@ -34,7 +34,7 @@
 | | ... | *-h, --help*
 | | ... | *--error <RuleName>, -e <RuleName>*
 | | ... | *--ignore <RuleName>, -i <RuleName>*
-| | ... | *--warn <RuleName>, -w <RuleName>*
+| | ... | *--warning <RuleName>, -w <RuleName>*
 | | ... | *--list*
 | | ... | *--rulefile RULEFILE, -R RULEFILE
 | | ... | *--no-filenames*
@@ -52,6 +52,23 @@
 | | rflint return code should be | 0
 | | log | STDOUT:\n${result.stdout}
 | | log | STDERR:\n${result.stderr}
+
+| --argumentfile option
+| | [Documentation]
+| | ... | Verify that the --argumentfile option correctly handles a good argument file
+| | [Setup] | Create file | ${TEMPDIR}/test.args | --ignore all\n
+| | 
+| | run rf-lint with the following options:
+| | ... | --argumentfile | ${TEMPDIR}/test.args
+| | ... | --list 
+| | # since each line of output begins with a single quote and then
+| | # the severity (gotta remove that stupid quote!), search for
+| | # lines that do _not_ begin with that. There should be none.
+| | ${lines}= | Get lines matching regexp | ${result.stdout} | ^'[^I]'
+| | length should be | ${lines} | 0
+| | ... | Not all rules are being ignored. Bummer? You bet!
+| | 
+| | [Teardown] | Remove file | ${TEMPDIR}/test.args
 
 | rflint this file
 | | [Documentation]
