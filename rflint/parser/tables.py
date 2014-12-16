@@ -1,3 +1,5 @@
+import re
+
 class RobotTable(object):
     '''A table made up of zero or more rows'''
     def __init__(self, parent, linenumber=0, name=None):
@@ -13,6 +15,11 @@ class RobotTable(object):
 
     def append(self, row):
         self.rows.append(row)
+
+    def is_valid(self):
+        return re.match(
+            r'settings?|metadata|(test )?cases?|(user )?keywords?|variables?',
+            self.name, re.IGNORECASE)
 
     def __str__(self):
         if self.name is None:

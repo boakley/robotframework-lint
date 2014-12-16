@@ -226,7 +226,7 @@ class RfLint(object):
                         if self.has_robot_extension(filename):
                             suite = RobotFileFactory(os.path.join(root, filename))
                             for table in suite.tables:
-                                if re.match(r'settings?|metadata|(test )?cases?|(user )?keywords?|variables?', table.name, re.IGNORECASE):
+                                if table.is_valid():
                                     suites[suite.path] = suite
                                     break
                     if not recursive:

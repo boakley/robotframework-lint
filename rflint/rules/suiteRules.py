@@ -24,8 +24,7 @@ class InvalidTable(SuiteRule):
 
     def apply(self, suite):
         for table in suite.tables:
-            if (not re.match(r'settings?|metadata|(test )?cases?|(user )?keywords?|variables?', 
-                             table.name, re.IGNORECASE)):
+            if not table.is_valid():
                 self.report(suite, "Unknown table name '%s'" % table.name, table.linenumber)
 
 
