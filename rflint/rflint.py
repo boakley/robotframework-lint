@@ -206,6 +206,7 @@ class RfLint(object):
         for extension in extensions:
             if path.lower().endswith(extension):
                 return True
+        return False
 
     def process_paths_to_suites(self, paths, recursive=False):
         """Return a list of all robot files in the provided list of paths.
@@ -220,24 +221,15 @@ class RfLint(object):
                 suites[suite.path] = suite
                 continue
             elif os.path.isdir(path):
-                if recursive:
-                    for root, dirs, files in os.walk(path):
-                        for filename in files:
-                            if self.has_robot_extension(filename):
-                                suite = RobotFileFactory(os.path.join(root, filename))
-                                for table in suite.tables:
-                                    if re.match(r'settings?|metadata|(test )?cases?|(user )?keywords?|variables?', table.name, re.IGNORECASE):
-                                        suites[suite.path] = suite
-                                        break
-                else:
-                    for entry in os.listdir(path):
-                        entry_path = os.path.join(path, entry)
-                        if (os.path.isfile(entry_path)
-                                and self.has_robot_extension(entry)):
-                            suite = RobotFileFactory(entry_path)
+                for root, dirs, files in os.walk(path):
+                    for filename in files:
+                        if self.has_robot_extension(filename):
+                            suite = RobotFileFactory(os.path.join(root, filename))
                             for table in suite.tables:
                                 if re.match(r'settings?|metadata|(test )?cases?|(user )?keywords?|variables?', table.name, re.IGNORECASE):
                                     suites[suite.path] = suite
                                     break
+                    if not recursive:
+                        break
         return suites
 
