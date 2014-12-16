@@ -22,6 +22,7 @@ import sys
 import glob
 import argparse
 import imp
+import re
 
 from .common import SuiteRule, TestRule, KeywordRule, GeneralRule, Rule
 from .common import ERROR, WARNING, IGNORE
@@ -69,13 +70,13 @@ class RfLint(object):
         
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
             
-        for filename in self.args.args:
-            if not (os.path.exists(filename)):
-                sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
+        for suite_path in sorted(self.args.suites):
+            suite = self.args.suites[suite_path]
+            if not (os.path.exists(suite.path)):
+                sys.stderr.write("rflint: %s: No such file or directory\n" % suite.path)
                 continue
             if not (self.args.no_filenames):
-                print "+ "+filename
-            suite = RobotFileFactory(filename)
+                print "+ "+ suite.path
             for rule in self.suite_rules:
                 if rule.severity != IGNORE:
                     rule.apply(suite)
@@ -167,6 +168,8 @@ class RfLint(object):
                             help="Give verbose output")
         parser.add_argument("--rulefile", "-R", action="append",
                             help="import additional rules from the given RULEFILE")
+        parser.add_argument("--recursive", "-r", action="store_true",
+                            help="Run on directories recursively")
         parser.add_argument("--argumentfile", "-A", action=ArgfileLoader)
         parser.add_argument('args', metavar="<filenames>", nargs=argparse.REMAINDER)
 
@@ -179,7 +182,39 @@ class RfLint(object):
 
         Rule.output_format = args.format
 
+        args.suites = self.process_paths_to_suites(args.args, args.recursive)
+
         return args
+
+    def has_robot_extension(self, path):
+        """Return True if path ends with .robot, .txt, or .tsv."""
+        extensions = ['.robot', '.txt', '.tsv']
+        return os.path.splitext(path.lower())[1] in extensions
+
+    def process_paths_to_suites(self, paths, recursive=False):
+        """Return a list of all robot files in the provided list of paths.
+
+        If any of the paths are directories, find all robot files
+        within those directories. Optionally, run recursively on directories.
+        """
+        suites = dict()
+        for path in paths:
+            if os.path.isfile(path):
+                suite = RobotFileFactory(path)
+                suites[suite.path] = suite
+                continue
+            elif os.path.isdir(path):
+                for root, dirs, files in os.walk(path):
+                    for filename in files:
+                        if self.has_robot_extension(filename):
+                            suite = RobotFileFactory(os.path.join(root, filename))
+                            for table in suite.tables:
+                                if table.is_valid():
+                                    suites[suite.path] = suite
+                                    break
+                    if not recursive:
+                        break
+        return suites
         
 class SetWarningAction(argparse.Action):
     '''Called when the argument parser encounters --warning'''
