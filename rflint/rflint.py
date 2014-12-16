@@ -189,10 +189,7 @@ class RfLint(object):
     def has_robot_extension(self, path):
         """Return True if path ends with .robot, .txt, or .tsv."""
         extensions = ['.robot', '.txt', '.tsv']
-        for extension in extensions:
-            if path.lower().endswith(extension):
-                return True
-        return False
+        return os.path.splitext(path.lower())[1] in extensions
 
     def process_paths_to_suites(self, paths, recursive=False):
         """Return a list of all robot files in the provided list of paths.
