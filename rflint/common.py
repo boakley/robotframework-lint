@@ -2,6 +2,7 @@ import rflint
 
 ERROR="E"
 WARNING="W"
+IGNORE="I"
 
 class Rule(object): 
     # default severity; subclasses may override
