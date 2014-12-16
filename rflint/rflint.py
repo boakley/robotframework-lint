@@ -94,15 +94,15 @@ class RfLint(object):
 
     def list_rules(self):
         """Print a list of all rules"""
-        all_rules = [repr(x) for x in self.suite_rules] + \
-                    [repr(x) for x in self.testcase_rules] + \
-                    [repr(x) for x in self.keyword_rules] + \
-                    [repr(x) for x in self.general_rules] 
-
-        print "\n".join(sorted([repr(x) for x in all_rules], 
-                               key=lambda s: s[2:]))
+        all_rules = self.suite_rules + self.testcase_rules + self.keyword_rules + self.general_rules
+        for rule in sorted(all_rules, key=lambda rule: rule.name):
+            print rule
+            if self.args.verbose:
+                for line in rule.doc.split("\n"):
+                    print "    ", line
 
     def report(self, linenumber, filename, severity, message, rulename, char):
+        '''Report a rule violation'''
         if severity in (WARNING, ERROR):
             self.counts[severity] += 1
         else:
@@ -163,6 +163,8 @@ class RfLint(object):
                             default='{severity}: {linenumber}, {char}: {message} ({rulename})')
         parser.add_argument("--version", action="store_true", default=False,
                             help="Display version number and exit")
+        parser.add_argument("--verbose", "-v", action="store_true", default=False,
+                            help="Give verbose output")
         parser.add_argument("--rulefile", "-R", action="append",
                             help="import additional rules from the given RULEFILE")
         parser.add_argument("--argumentfile", "-A", action=ArgfileLoader)
