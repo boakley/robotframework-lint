@@ -32,13 +32,15 @@
 | | ... | usage:*
 | | ... | optional arguments:
 | | ... | *-h, --help*
-| | ... | *--error <RuleName>, -e <RuleName>*
-| | ... | *--ignore <RuleName>, -i <RuleName>*
-| | ... | *--warning <RuleName>, -w <RuleName>*
+| | ... | *--error RULENAME, -e RULENAME*
+| | ... | *--ignore RULENAME, -i RULENAME*
+| | ... | *--warning RULENAME, -w RULENAME*
 | | ... | *--list*
-| | ... | *--rulefile RULEFILE, -R RULEFILE
+| | ... | *--rulefile RULEFILE, -R RULEFILE*
 | | ... | *--no-filenames*
 | | ... | *--format FORMAT, -f FORMAT*
+| | ... | *--recursive, -r*
+| | ... | *--argumentfile ARGUMENTFILE, -A ARGUMENTFILE*
 
 | | log | STDOUT:\n${result.stdout}
 | | log | STDERR:\n${result.stderr}

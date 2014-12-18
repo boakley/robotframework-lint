@@ -73,24 +73,40 @@ class RfLint(object):
             if not (os.path.exists(filename)):
                 sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
                 continue
-            if not (self.args.no_filenames):
-                print "+ "+filename
-            suite = RobotFileFactory(filename)
-            for rule in self.suite_rules:
-                if rule.severity != IGNORE:
-                    rule.apply(suite)
-            for testcase in suite.testcases:
-                for rule in self.testcase_rules:
-                    if rule.severity != IGNORE:
-                        rule.apply(testcase)
-            for keyword in suite.keywords:
-                for rule in self.keyword_rules:
-                    if rule.severity != IGNORE:
-                        rule.apply(keyword)
+            if os.path.isdir(filename):
+                self._process_folder(filename)
+            else:
+                self._process_file(filename)
 
         if self.counts[ERROR] > 0:
             sys.exit(self.counts[ERROR] if self.counts[ERROR] < 254 else 255)
         sys.exit(0)
+
+    def _process_folder(self, path):
+        for root, dirs, files in os.walk(path):
+            for filename in files:
+                name, ext = os.path.splitext(filename)
+                if ext.lower() in (".robot", ".txt", ".tsv"):
+                    self._process_file(os.path.join(root, filename))
+            if self.args.recursive:
+                for dirname in dirs:
+                    self._process_folder(os.path.join(root, dirname))
+ 
+    def _process_file(self, filename):
+        if not (self.args.no_filenames):
+            print "+ "+filename
+        suite = RobotFileFactory(filename)
+        for rule in self.suite_rules:
+            if rule.severity != IGNORE:
+                rule.apply(suite)
+        for testcase in suite.testcases:
+            for rule in self.testcase_rules:
+                if rule.severity != IGNORE:
+                    rule.apply(testcase)
+        for keyword in suite.keywords:
+            for rule in self.keyword_rules:
+                if rule.severity != IGNORE:
+                    rule.apply(keyword)
 
     def list_rules(self):
         """Print a list of all rules"""
@@ -137,25 +153,36 @@ class RfLint(object):
 
         parser = argparse.ArgumentParser(
             prog="python -m rflint",
-            description="A style checker for robot framework plain text files",
+            description="A style checker for robot framework plain text files.",
+            formatter_class=argparse.RawDescriptionHelpFormatter,
             epilog = (
-                "You can use 'all' in place of <RuleName> to refer to all rules. "
-                "For example: '--ignore all --warn DuplicateTestNames' will ignore all rules "
-                "except DuplicateTestNames."
-                "  "
-                "FORMAT is a string that performs a substitution on the following "
-                "patterns: {severity}, {linenumber}, {char}, {message}, and {rulename}. "
-                "For example: --format 'line: {linenumber}: message: {message}'. "
+                "You can use 'all' in place of RULENAME to refer to all rules. \n"
+                "\n"
+                "For example: '--ignore all --warn DuplicateTestNames' will ignore all\n"
+                "rules except DuplicateTestNames.\n"
+                "\n"
+                "FORMAT is a string that performs a substitution on the following \n"
+                "patterns: {severity}, {linenumber}, {char}, {message}, and {rulename}.\n"
+                "\n"
+                "For example: --format 'line: {linenumber}: message: {message}'. \n"
+                "\n"
+                "ARGUMENTFILE is a filename with contents that match the format of \n"
+                "standard robot framework argument files\n"
+                "\n"
+                "If you give a directory as an argument, all files in the directory\n"
+                "with the suffix .txt, .robot or .tsv will be processed. With the \n"
+                "--recursive option, subfolders within the directory will also be\n"
+                "processed."
                 )
             )
-        parser.add_argument("--error", "-e", metavar="<RuleName>", action=SetErrorAction,
-                            help="Assign a severity of ERROR to the given RuleName")
-        parser.add_argument("--ignore", "-i", metavar="<RuleName>", action=SetIgnoreAction,
-                            help="Ignore the given RuleName")
-        parser.add_argument("--warning", "-w", metavar="<RuleName>", action=SetWarningAction,
-                            help="Assign a severity of WARNING for the given RuleName")
+        parser.add_argument("--error", "-e", metavar="RULENAME", action=SetErrorAction,
+                            help="Assign a severity of ERROR to the given RULENAME")
+        parser.add_argument("--ignore", "-i", metavar="RULENAME", action=SetIgnoreAction,
+                            help="Ignore the given RULENAME")
+        parser.add_argument("--warning", "-w", metavar="RULENAME", action=SetWarningAction,
+                            help="Assign a severity of WARNING for the given RULENAME")
         parser.add_argument("--list", "-l", action="store_true",
-                            help="show a list of known rules, then exit")
+                            help="show a list of known rules and exit")
         parser.add_argument("--no-filenames", action="store_true",
                             help="suppress the printing of filenames")
         parser.add_argument("--format", "-f", 
@@ -165,10 +192,13 @@ class RfLint(object):
                             help="Display version number and exit")
         parser.add_argument("--verbose", "-v", action="store_true", default=False,
                             help="Give verbose output")
+        parser.add_argument("--recursive", "-r", action="store_true", default=False,
+                            help="Recursively scan subfolders in a directory")
         parser.add_argument("--rulefile", "-R", action="append",
                             help="import additional rules from the given RULEFILE")
-        parser.add_argument("--argumentfile", "-A", action=ArgfileLoader)
-        parser.add_argument('args', metavar="<filenames>", nargs=argparse.REMAINDER)
+        parser.add_argument("--argumentfile", "-A", action=ArgfileLoader,
+                            help="read arguments from the given file")
+        parser.add_argument('args', metavar="file", nargs=argparse.REMAINDER)
 
         # create a custom namespace, in which we can store a reference to
         # our rules. This lets the custom argument actions access the list
