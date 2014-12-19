@@ -10,7 +10,7 @@
 *** Test Cases ***
 | Test suite WITH too many test cases
 | | [Documentation]
-| | ... | Verify that a testcase with a period in the name triggers the rule.
+| | ... | Verify that a test suite with too many test cases triggers the rule.
 | |
 | | [Setup] | Run rf-lint with the following options:
 | | ... | --no-filename
@@ -24,7 +24,7 @@
 
 | Testcase WITHOUT too many test cases
 | | [Documentation]
-| | ... | Verify that a testcase without a period in the name does NOT trigger the rule.
+| | ... | Verify that a test suite without too many test cases does NOT trigger the rule.
 | |
 | | [Setup] | Run rf-lint with the following options:
 | | ... | --no-filename
