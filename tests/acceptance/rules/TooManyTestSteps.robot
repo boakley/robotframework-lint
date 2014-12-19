@@ -10,7 +10,7 @@
 *** Test Cases ***
 | Testcase WITHOUT too many test steps
 | | [Documentation]
-| | ... | Verify that a testcase without a period in the name does NOT trigger the rule.
+| | ... | Verify that a testcase without too many test steps triggers the rule.
 | |
 | | [Setup] | Run rf-lint with the following options:
 | | ... | --no-filename
