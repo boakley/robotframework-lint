@@ -42,17 +42,3 @@
 | | rflint return code should be | 1
 | | rflint should report 1 errors
 | | rflint should report 0 warnings
-
-| Testcase WITHOUT too many test steps
-| | [Documentation]
-| | ... | Verify that a testcase without a period in the name does NOT trigger the rule.
-| |
-| | [Setup] | Run rf-lint with the following options:
-| | ... | --no-filename
-| | ... | --ignore | all
-| | ... | --error  | TooManyTestSteps
-| | ... | ${SUITE SOURCE} | use this file as input
-| |
-| | rflint return code should be | 0
-| | rflint should report 0 errors
-| | rflint should report 0 warnings
