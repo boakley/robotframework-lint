@@ -67,10 +67,11 @@ class TooManyTestSteps(TestRule):
     severity=WARNING
 
     def apply(self, testcase):
-        # ignore this rule for templated (data-driven) test cases
-        for setting in testcase.settings:
-            if setting[1].lower() == "[template]":
-                return
-        steps = list(testcase.steps)
+        if testcase.is_templated:
+            return
+
+        # ignore empty test steps
+        steps = [step for step in testcase.steps if not (len(step) == 1
+                                                         and not step[0])]
         if len(steps) > 10:
             self.report(testcase, "Too many steps (%s) in test case" % len(steps), testcase.linenumber)
