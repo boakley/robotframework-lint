@@ -30,4 +30,9 @@ setup(
         'rflint.parser',
         ],
     scripts          =[], 
+    entry_points={
+        'console_scripts': [
+            "rflint = rflint.__main__:main"
+        ]
+    }
 )

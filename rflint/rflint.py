@@ -57,7 +57,7 @@ class RfLint(object):
 
         if self.args.version:
             print __version__
-            sys.exit(0)
+            return 0
             
         if self.args.rulefile:
             for filename in self.args.rulefile:
@@ -65,7 +65,7 @@ class RfLint(object):
 
         if self.args.list:
             self.list_rules()
-            sys.exit(0)
+            return 0
         
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
             
@@ -79,8 +79,9 @@ class RfLint(object):
                 self._process_file(filename)
 
         if self.counts[ERROR] > 0:
-            sys.exit(self.counts[ERROR] if self.counts[ERROR] < 254 else 255)
-        sys.exit(0)
+            return self.counts[ERROR] if self.counts[ERROR] < 254 else 255
+
+        return 0
 
     def _process_folder(self, path):
         for root, dirs, files in os.walk(path):
