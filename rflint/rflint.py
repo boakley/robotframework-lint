@@ -85,12 +85,12 @@ class RfLint(object):
 
     def _process_folder(self, path):
         for root, dirs, files in os.walk(path):
-            for filename in files:
+            for filename in sorted(files):
                 name, ext = os.path.splitext(filename)
                 if ext.lower() in (".robot", ".txt", ".tsv"):
                     self._process_file(os.path.join(root, filename))
             if self.args.recursive:
-                for dirname in dirs:
+                for dirname in sorted(dirs):
                     self._process_folder(os.path.join(root, dirname))
  
     def _process_file(self, filename):
