@@ -69,6 +69,10 @@ class RfLint(object):
         
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
             
+        # _current_filename is used to track when we should print the
+        # filename and when we shouldn't
+        self._current_filename = None
+
         for filename in self.args.args:
             if not (os.path.exists(filename)):
                 sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
@@ -94,8 +98,12 @@ class RfLint(object):
                     self._process_folder(os.path.join(root, dirname))
  
     def _process_file(self, filename):
-        if not (self.args.no_filenames):
-            print "+ "+filename
+        # this is used by the reporting mechanism to know if it
+        # should print the filename. Once it has been printed it
+        # will be reset so that it won't get printed again until 
+        # we process the next file.
+        self._print_filename = filename if self.args.print_filenames else None
+
         suite = RobotFileFactory(filename)
         for rule in self.suite_rules:
             if rule.severity != IGNORE:
@@ -120,6 +128,13 @@ class RfLint(object):
 
     def report(self, linenumber, filename, severity, message, rulename, char):
         '''Report a rule violation'''
+
+        if self._print_filename is not None:
+            # we print the filename only once. self._print_filename
+            # will get reset each time a new file is processed.
+            print "+ " + self._print_filename
+            self._print_filename = None
+
         if severity in (WARNING, ERROR):
             self.counts[severity] += 1
         else:
@@ -184,7 +199,8 @@ class RfLint(object):
                             help="Assign a severity of WARNING for the given RULENAME")
         parser.add_argument("--list", "-l", action="store_true",
                             help="show a list of known rules and exit")
-        parser.add_argument("--no-filenames", action="store_true",
+        parser.add_argument("--no-filenames", action="store_false", dest="print_filenames", 
+                            default=True,
                             help="suppress the printing of filenames")
         parser.add_argument("--format", "-f", 
                             help="Define the output format",
