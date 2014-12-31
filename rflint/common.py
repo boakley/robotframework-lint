@@ -66,10 +66,16 @@ class TestRule(Rule):
     """
     pass
 
+class ResourceRule(Rule):
+    """Rule that runs against a resource file
+
+    The object that is passed in will be of type rflint.parser.ResourceFile
+    """
+
 class SuiteRule(Rule): 
     """Rule that runs against test cases. 
 
-    The object that is passed in will be of type rflint.parser.Suite
+    The object that is passed in will be of type rflint.parser.SuiteFile
     """
     pass
 

@@ -23,10 +23,10 @@ import glob
 import argparse
 import imp
 
-from .common import SuiteRule, TestRule, KeywordRule, GeneralRule, Rule
+from .common import SuiteRule, ResourceRule, TestRule, KeywordRule, GeneralRule, Rule
 from .common import ERROR, WARNING, IGNORE
 from version import __version__
-from parser import RobotFileFactory
+from parser import RobotFileFactory, SuiteFile, ResourceFile
 
 from robot.utils.argumentparser import ArgFileParser
 
@@ -47,6 +47,7 @@ class RfLint(object):
         """Parse command line arguments, and run rflint"""
 
         self.suite_rules = self._get_rules(SuiteRule)
+        self.resource_rules = self._get_rules(ResourceRule)
         self.testcase_rules = self._get_rules(TestRule)
         self.keyword_rules = self._get_rules(KeywordRule)
         self.general_rules = self._get_rules(GeneralRule)
@@ -104,22 +105,31 @@ class RfLint(object):
         # we process the next file.
         self._print_filename = filename if self.args.print_filenames else None
 
-        suite = RobotFileFactory(filename)
-        for rule in self.suite_rules:
-            if rule.severity != IGNORE:
-                rule.apply(suite)
-        for testcase in suite.testcases:
-            for rule in self.testcase_rules:
+        robot_file = RobotFileFactory(filename)
+        if isinstance(robot_file, SuiteFile):
+            for rule in self.suite_rules:
                 if rule.severity != IGNORE:
-                    rule.apply(testcase)
-        for keyword in suite.keywords:
+                    rule.apply(robot_file)
+            for testcase in robot_file.testcases:
+                for rule in self.testcase_rules:
+                    if rule.severity != IGNORE:
+                        rule.apply(testcase)
+
+        if isinstance(robot_file, ResourceFile):
+            for rule in self.resource_rules:
+                if rule.severity != IGNORE:
+                    rule.apply(robot_file)
+
+        for keyword in robot_file.keywords:
             for rule in self.keyword_rules:
                 if rule.severity != IGNORE:
                     rule.apply(keyword)
 
     def list_rules(self):
         """Print a list of all rules"""
-        all_rules = self.suite_rules + self.testcase_rules + self.keyword_rules + self.general_rules
+        all_rules = self.suite_rules + self.resource_rules + \
+                    self.testcase_rules + self.keyword_rules + self.general_rules
+
         for rule in sorted(all_rules, key=lambda rule: rule.name):
             print rule
             if self.args.verbose:
