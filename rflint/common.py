@@ -87,7 +87,7 @@ class KeywordRule(Rule):
     pass
 
 class GeneralRule(Rule):
-    """Rule that requires a suite, but may apply to child objects
+    """Rule that requires a suite or resource file, but may apply to child objects
 
     This rule is identical to a SuiteRule, but exists in case you want
     to write a rule that accepts a suite but doesn't necessarily apply
