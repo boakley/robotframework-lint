@@ -81,9 +81,11 @@ class RobotFile(object):
         self.tables = []
         current_table = DefaultTable(self)
 
-        with open(path, "rb") as f:
+        with Utf8Reader(path) as f:
+            self.raw_text = f.read()
+            f._file.seek(0) # bleh; wish this wasn't a private property
             matcher = Matcher(re.IGNORECASE)
-            for linenumber, raw_text in enumerate(Utf8Reader(f).readlines()):
+            for linenumber, raw_text in enumerate(f.readlines()):
                 linenumber += 1; # start counting at 1 rather than zero
 
                 # this mimics what the robot TSV reader does --

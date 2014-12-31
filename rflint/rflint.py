@@ -106,6 +106,10 @@ class RfLint(object):
         self._print_filename = filename if self.args.print_filenames else None
 
         robot_file = RobotFileFactory(filename)
+        for rule in self.general_rules:
+            if rule.severity != IGNORE:
+                rule.apply(robot_file)
+
         if isinstance(robot_file, SuiteFile):
             for rule in self.suite_rules:
                 if rule.severity != IGNORE:

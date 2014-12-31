@@ -87,8 +87,13 @@
 | this file, converted to TSV
 | | [Documentation]
 | | ... | Run rflint against this file in .tsv format
+| | ... |
+| | ... | Note: robotidy likes to make really long lines, so we need
+| | ... | to turn off the LineTooLong rule
 | | [Setup] | Convert ${SUITE_SOURCE} to .tsv
-| | Run rf-lint with the following options: | ${TEMPDIR}/smoke.tsv
+| | Run rf-lint with the following options: 
+| | ... | --ignore | LineTooLong
+| | ... | ${TEMPDIR}/smoke.tsv
 | | rflint return code should be | 0
 | | rflint should report 0 errors
 | | rflint should report 0 warnings
@@ -98,7 +103,9 @@
 | | [Documentation] 
 | | ... | Run rflint against this file in space separated format
 | | [Setup] | Convert ${SUITE_SOURCE} to .txt
-| | run rf-lint with the following options: | ${TEMPDIR}/smoke.txt
+| | run rf-lint with the following options: 
+| | ... | --ignore | LineTooLong
+| | ... | ${TEMPDIR}/smoke.txt
 | | rflint return code should be | 0
 | | rflint should report 0 errors
 | | rflint should report 0 warnings
