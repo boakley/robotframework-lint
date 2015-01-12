@@ -15,6 +15,10 @@ class Rule(object):
         if severity is not None:
             self.severity = severity
 
+    def configure(self, *args, **kwargs):
+        # subclasses can override this if they want to be configurable.
+        raise Exception("rule '%s' is not configurable" % self.__class__.__name__)
+
     @property
     def name(self):
         return self.__class__.__name__
