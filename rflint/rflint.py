@@ -223,6 +223,8 @@ class RfLint(object):
                             help="Display version number and exit")
         parser.add_argument("--verbose", "-v", action="store_true", default=False,
                             help="Give verbose output")
+        parser.add_argument("--configure", "-c", action=ConfigureAction,
+                            help="Configure a rule")
         parser.add_argument("--recursive", "-r", action="store_true", default=False,
                             help="Recursively scan subfolders in a directory")
         parser.add_argument("--rulefile", "-R", action="append",
@@ -242,23 +244,50 @@ class RfLint(object):
 
         return args
         
-class SetWarningAction(argparse.Action):
+class ConfigureAction(argparse.Action):
+    def __call__(self, parser, namespace, arg, option_string=None):
+        rulename, argstring = arg.split(":", 1)
+        args = argstring.split(":")
+        for rule in getattr(namespace, "_rules"):
+            if rulename == rule.name:
+                rule.configure(*args)
+                return
+        raise Exception("unknown rule: '%s'" % rulename)
+
+class SetStatusAction(argparse.Action):
+    '''Abstract class which provides a method for checking the rule name'''
+    def check_rule_name(self, rulename, rules):
+        if (rulename != "all" and 
+            rulename.lower() not in [rule.name.lower() for rule in rules]):
+            raise Exception("unknown rule: '%s'" % rulename);
+        
+class SetWarningAction(SetStatusAction):
     '''Called when the argument parser encounters --warning'''
     def __call__(self, parser, namespace, rulename, option_string = None):
+
+        self.check_rule_name(rulename, getattr(namespace, "_rules"))
+
         for rule in getattr(namespace, "_rules"):
             if rulename == rule.name or rulename == "all":
                 rule.severity = WARNING
 
-class SetErrorAction(argparse.Action):
+class SetErrorAction(SetStatusAction):
     '''Called when the argument parser encounters --error'''
     def __call__(self, parser, namespace, rulename, option_string = None):
+
+        self.check_rule_name(rulename, getattr(namespace, "_rules"))
+
         for rule in getattr(namespace, "_rules"):
             if rulename == rule.name or rulename == "all":
                 rule.severity = ERROR
 
-class SetIgnoreAction(argparse.Action):
+
+class SetIgnoreAction(SetStatusAction):
     '''Called when the argument parser encounters --ignore'''
     def __call__(self, parser, namespace, rulename, option_string = None):
+
+        self.check_rule_name(rulename, getattr(namespace, "_rules"))
+
         for rule in getattr(namespace, "_rules"):
             if rulename == rule.name or rulename == "all":
                 rule.severity = IGNORE
