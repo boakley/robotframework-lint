@@ -1,7 +1,7 @@
 *** Settings ***
 | Documentation
 | ... | Runs rflint against the rflint test suites and resource files
-| # 
+| #
 | Library    | OperatingSystem
 | Library    | Process
 | Resource   | SharedKeywords.robot
@@ -44,5 +44,3 @@
 | | 
 | | Run keyword if | "${result.rc}" != "${expected_rc}" or ${warnings} != 0 or ${errors} != 0
 | | ... | Fail | unexpectected errors or warnings: \n${result.stdout}\n${result.stderr}
-
-
