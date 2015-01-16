@@ -42,3 +42,33 @@
 | | rflint return code should be | 1
 | | rflint should report 1 errors
 | | rflint should report 0 warnings
+
+| Testcase WITHOUT too many test steps after configuration
+| | [Documentation]
+| | ... | Verify that a testcase with too many test steps triggers the rule.
+| |
+| | [Setup] | Run rf-lint with the following options:
+| | ... | --no-filename
+| | ... | --ignore | all
+| | ... | --error  | TooManyTestSteps
+| | ... | --configure  | TooManyTestSteps:20
+| | ... | test_data/acceptance/rules/TooManyTestSteps.robot
+| |
+| | rflint return code should be | 0
+| | rflint should report 0 errors
+| | rflint should report 0 warnings
+
+| Testcase WITH too many test steps after configuration
+| | [Documentation]
+| | ... | Verify that a testcase with too many test steps triggers the rule.
+| |
+| | [Setup] | Run rf-lint with the following options:
+| | ... | --no-filename
+| | ... | --ignore | all
+| | ... | --error  | TooManyTestSteps
+| | ... | --configure  | TooManyTestSteps:1
+| | ... | test_data/acceptance/rules/TooManyTestSteps.robot
+| |
+| | rflint return code should be | 1
+| | rflint should report 1 errors
+| | rflint should report 0 warnings
