@@ -32,13 +32,15 @@
 | | ... | usage:*
 | | ... | optional arguments:
 | | ... | *-h, --help*
-| | ... | *--error <RuleName>, -e <RuleName>*
-| | ... | *--ignore <RuleName>, -i <RuleName>*
-| | ... | *--warn <RuleName>, -w <RuleName>*
+| | ... | *--error RULENAME, -e RULENAME*
+| | ... | *--ignore RULENAME, -i RULENAME*
+| | ... | *--warning RULENAME, -w RULENAME*
 | | ... | *--list*
-| | ... | *--rulefile RULEFILE, -R RULEFILE
+| | ... | *--rulefile RULEFILE, -R RULEFILE*
 | | ... | *--no-filenames*
 | | ... | *--format FORMAT, -f FORMAT*
+| | ... | *--recursive, -r*
+| | ... | *--argumentfile ARGUMENTFILE, -A ARGUMENTFILE*
 
 | | log | STDOUT:\n${result.stdout}
 | | log | STDERR:\n${result.stderr}
@@ -52,6 +54,23 @@
 | | rflint return code should be | 0
 | | log | STDOUT:\n${result.stdout}
 | | log | STDERR:\n${result.stderr}
+
+| --argumentfile option
+| | [Documentation]
+| | ... | Verify that the --argumentfile option correctly handles a good argument file
+| | [Setup] | Create file | ${TEMPDIR}/test.args | --ignore all\n
+| | 
+| | run rf-lint with the following options:
+| | ... | --argumentfile | ${TEMPDIR}/test.args
+| | ... | --list 
+| | # since each line of output begins with a single quote and then
+| | # the severity (gotta remove that stupid quote!), search for
+| | # lines that do _not_ begin with that. There should be none.
+| | ${lines}= | Get lines matching regexp | ${result.stdout} | ^'[^I]'
+| | length should be | ${lines} | 0
+| | ... | Not all rules are being ignored. Bummer? You bet!
+| | 
+| | [Teardown] | Remove file | ${TEMPDIR}/test.args
 
 | rflint this file
 | | [Documentation]
@@ -68,8 +87,13 @@
 | this file, converted to TSV
 | | [Documentation]
 | | ... | Run rflint against this file in .tsv format
+| | ... |
+| | ... | Note: robotidy likes to make really long lines, so we need
+| | ... | to turn off the LineTooLong rule
 | | [Setup] | Convert ${SUITE_SOURCE} to .tsv
-| | Run rf-lint with the following options: | ${TEMPDIR}/smoke.tsv
+| | Run rf-lint with the following options: 
+| | ... | --ignore | LineTooLong
+| | ... | ${TEMPDIR}/smoke.tsv
 | | rflint return code should be | 0
 | | rflint should report 0 errors
 | | rflint should report 0 warnings
@@ -79,7 +103,9 @@
 | | [Documentation] 
 | | ... | Run rflint against this file in space separated format
 | | [Setup] | Convert ${SUITE_SOURCE} to .txt
-| | run rf-lint with the following options: | ${TEMPDIR}/smoke.txt
+| | run rf-lint with the following options: 
+| | ... | --ignore | LineTooLong
+| | ... | ${TEMPDIR}/smoke.txt
 | | rflint return code should be | 0
 | | rflint should report 0 errors
 | | rflint should report 0 warnings

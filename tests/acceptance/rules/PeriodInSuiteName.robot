@@ -30,7 +30,7 @@
 | | ... | --no-filename
 | | ... | --ignore | all 
 | | ... | --error  | PeriodInSuiteName
-| | ... | ${SUITE SOURCE} | use this file as input
+| | ... | ${SUITE SOURCE} | # use this file as input
 | | 
 | | rflint return code should be | 0
 | | rflint should report 0 errors

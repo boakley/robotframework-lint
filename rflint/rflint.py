@@ -23,10 +23,12 @@ import glob
 import argparse
 import imp
 
-from .common import SuiteRule, TestRule, KeywordRule, GeneralRule, Rule, ERROR, WARNING
+from .common import SuiteRule, ResourceRule, TestRule, KeywordRule, GeneralRule, Rule
+from .common import ERROR, WARNING, IGNORE
 from version import __version__
-from parser import RobotFileFactory
+from parser import RobotFileFactory, SuiteFile, ResourceFile
 
+from robot.utils.argumentparser import ArgFileParser
 
 class RfLint(object):
     """Robot Framework Linter"""
@@ -44,63 +46,109 @@ class RfLint(object):
     def run(self, args):
         """Parse command line arguments, and run rflint"""
 
+        self.suite_rules = self._get_rules(SuiteRule)
+        self.resource_rules = self._get_rules(ResourceRule)
+        self.testcase_rules = self._get_rules(TestRule)
+        self.keyword_rules = self._get_rules(KeywordRule)
+        self.general_rules = self._get_rules(GeneralRule)
+
+        self.all_rules = self.suite_rules + self.testcase_rules + self.keyword_rules + self.general_rules
+
         self.args = self.parse_and_process_args(args)
 
         if self.args.version:
             print __version__
-            sys.exit(0)
+            return 0
             
         if self.args.rulefile:
             for filename in self.args.rulefile:
                 self._load_rule_file(filename)
 
-        self.suite_rules = self._get_rules(SuiteRule)
-        self.testcase_rules = self._get_rules(TestRule)
-        self.keyword_rules = self._get_rules(KeywordRule)
-        self.general_rules = self._get_rules(GeneralRule)
-                
         if self.args.list:
             self.list_rules()
-            sys.exit(0)
+            return 0
         
-        all_rules = [repr(x) for x in self.suite_rules] + \
-                    [repr(x) for x in self.testcase_rules] + \
-                    [repr(x) for x in self.keyword_rules] + \
-                    [repr(x) for x in self.general_rules] 
-
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
             
+        # _current_filename is used to track when we should print the
+        # filename and when we shouldn't
+        self._current_filename = None
+
         for filename in self.args.args:
             if not (os.path.exists(filename)):
                 sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
                 continue
-            if not (self.args.no_filenames):
-                print "+ "+filename
-            suite = RobotFileFactory(filename)
-            for rule in self.suite_rules:
-                rule.apply(suite)
-            for testcase in suite.testcases:
-                for rule in self.testcase_rules:
-                    rule.apply(testcase)
-            for keyword in suite.keywords:
-                for rule in self.keyword_rules:
-                    rule.apply(keyword)
+            if os.path.isdir(filename):
+                self._process_folder(filename)
+            else:
+                self._process_file(filename)
 
         if self.counts[ERROR] > 0:
-            sys.exit(self.counts[ERROR] if self.counts[ERROR] < 254 else 255)
-        sys.exit(0)
+            return self.counts[ERROR] if self.counts[ERROR] < 254 else 255
+
+        return 0
+
+    def _process_folder(self, path):
+        for root, dirs, files in os.walk(path):
+            for filename in sorted(files):
+                name, ext = os.path.splitext(filename)
+                if ext.lower() in (".robot", ".txt", ".tsv"):
+                    self._process_file(os.path.join(root, filename))
+            if self.args.recursive:
+                for dirname in sorted(dirs):
+                    self._process_folder(os.path.join(root, dirname))
+ 
+    def _process_file(self, filename):
+        # this is used by the reporting mechanism to know if it
+        # should print the filename. Once it has been printed it
+        # will be reset so that it won't get printed again until 
+        # we process the next file.
+        self._print_filename = filename if self.args.print_filenames else None
+
+        robot_file = RobotFileFactory(filename)
+        for rule in self.general_rules:
+            if rule.severity != IGNORE:
+                rule.apply(robot_file)
+
+        if isinstance(robot_file, SuiteFile):
+            for rule in self.suite_rules:
+                if rule.severity != IGNORE:
+                    rule.apply(robot_file)
+            for testcase in robot_file.testcases:
+                for rule in self.testcase_rules:
+                    if rule.severity != IGNORE:
+                        rule.apply(testcase)
+
+        if isinstance(robot_file, ResourceFile):
+            for rule in self.resource_rules:
+                if rule.severity != IGNORE:
+                    rule.apply(robot_file)
+
+        for keyword in robot_file.keywords:
+            for rule in self.keyword_rules:
+                if rule.severity != IGNORE:
+                    rule.apply(keyword)
 
     def list_rules(self):
         """Print a list of all rules"""
-        all_rules = [repr(x) for x in self.suite_rules] + \
-                    [repr(x) for x in self.testcase_rules] + \
-                    [repr(x) for x in self.keyword_rules] + \
-                    [repr(x) for x in self.general_rules] 
+        all_rules = self.suite_rules + self.resource_rules + \
+                    self.testcase_rules + self.keyword_rules + self.general_rules
 
-        print "\n".join(sorted([repr(x) for x in all_rules], 
-                               key=lambda s: s[2:]))
+        for rule in sorted(all_rules, key=lambda rule: rule.name):
+            print rule
+            if self.args.verbose:
+                for line in rule.doc.split("\n"):
+                    print "    ", line
 
     def report(self, linenumber, filename, severity, message, rulename, char):
+        '''Report a rule violation'''
+
+        if self._print_filename is not None:
+            # we print the filename only once. self._print_filename
+            # will get reset each time a new file is processed.
+            print "+ " + self._print_filename
+            self._print_filename = None
+
         if severity in (WARNING, ERROR):
             self.counts[severity] += 1
         else:
@@ -114,27 +162,6 @@ class RfLint(object):
         result = []
         for rule_class in cls.__subclasses__():
             rule_name = rule_class.__name__.lower()
-
-            if ("all" in self.args.ignore and
-                (rule_name not in self.args.warn and
-                 rule_name not in self.args.error)):
-                # if we are told to ignore all, skip this one unless
-                # it was explicitly added with --ignore or --warn
-                continue
-
-            if ((rule_name in self.args.ignore)):
-                # if the user asked this rule to be ignored, skip it
-                continue
-
-            # if the rule was an option to --warn or --error, update
-            # the rule's severity
-            if rule_name in self.args.warn:
-                rule_class.severity = WARNING
-            elif rule_name in self.args.error:
-                rule_class.severity = ERROR
-
-            # create an instance of the rule, and add it
-            # to the list of result
             result.append(rule_class(self))
 
         return result
@@ -156,43 +183,118 @@ class RfLint(object):
 
         parser = argparse.ArgumentParser(
             prog="python -m rflint",
-            description="A style checker for robot framework plain text files",
+            description="A style checker for robot framework plain text files.",
+            formatter_class=argparse.RawDescriptionHelpFormatter,
             epilog = (
-                "You can use 'all' in place of <RuleName> to refer to all rules. "
-                "For example: '--ignore all --warn DuplicateTestNames' will ignore all rules "
-                "except DuplicateTestNames."
-                "  "
-                "FORMAT is a string that performs a substitution on the following "
-                "patterns: {severity}, {linenumber}, {char}, {message}, and {rulename}. "
-                "For example: --format 'line: {linenumber}: message: {message}'. "
+                "You can use 'all' in place of RULENAME to refer to all rules. \n"
+                "\n"
+                "For example: '--ignore all --warn DuplicateTestNames' will ignore all\n"
+                "rules except DuplicateTestNames.\n"
+                "\n"
+                "FORMAT is a string that performs a substitution on the following \n"
+                "patterns: {severity}, {linenumber}, {char}, {message}, and {rulename}.\n"
+                "\n"
+                "For example: --format 'line: {linenumber}: message: {message}'. \n"
+                "\n"
+                "ARGUMENTFILE is a filename with contents that match the format of \n"
+                "standard robot framework argument files\n"
+                "\n"
+                "If you give a directory as an argument, all files in the directory\n"
+                "with the suffix .txt, .robot or .tsv will be processed. With the \n"
+                "--recursive option, subfolders within the directory will also be\n"
+                "processed."
                 )
             )
-        parser.add_argument("--error", "-e", metavar="<RuleName>", action="append",
-                            help="Assign a severity of ERROR to the given RuleName")
-        parser.add_argument("--ignore", "-i", metavar="<RuleName>", action="append",
-                            help="Ignore the given RuleName")
-        parser.add_argument("--warn", "-w", metavar="<RuleName>", action="append",
-                            help="Assign a severity of WARNING for the given RuleName")
+        parser.add_argument("--error", "-e", metavar="RULENAME", action=SetErrorAction,
+                            help="Assign a severity of ERROR to the given RULENAME")
+        parser.add_argument("--ignore", "-i", metavar="RULENAME", action=SetIgnoreAction,
+                            help="Ignore the given RULENAME")
+        parser.add_argument("--warning", "-w", metavar="RULENAME", action=SetWarningAction,
+                            help="Assign a severity of WARNING for the given RULENAME")
         parser.add_argument("--list", "-l", action="store_true",
-                            help="show a list of known rules, then exit")
-        parser.add_argument("--no-filenames", action="store_true",
+                            help="show a list of known rules and exit")
+        parser.add_argument("--no-filenames", action="store_false", dest="print_filenames", 
+                            default=True,
                             help="suppress the printing of filenames")
         parser.add_argument("--format", "-f", 
                             help="Define the output format",
                             default='{severity}: {linenumber}, {char}: {message} ({rulename})')
         parser.add_argument("--version", action="store_true", default=False,
                             help="Display version number and exit")
+        parser.add_argument("--verbose", "-v", action="store_true", default=False,
+                            help="Give verbose output")
+        parser.add_argument("--configure", "-c", action=ConfigureAction,
+                            help="Configure a rule")
+        parser.add_argument("--recursive", "-r", action="store_true", default=False,
+                            help="Recursively scan subfolders in a directory")
         parser.add_argument("--rulefile", "-R", action="append",
                             help="import additional rules from the given RULEFILE")
-        parser.add_argument('args', metavar="<filenames>", nargs=argparse.REMAINDER)
+        parser.add_argument("--argumentfile", "-A", action=ArgfileLoader,
+                            help="read arguments from the given file")
+        parser.add_argument('args', metavar="file", nargs=argparse.REMAINDER)
 
-        args = parser.parse_args(args)
-        args.ignore = [rule.lower() for rule in args.ignore] if args.ignore else []
-        args.warn = [rule.lower() for rule in args.warn] if args.warn else []
-        args.error = [rule.lower() for rule in args.error] if args.error else []
+        # create a custom namespace, in which we can store a reference to
+        # our rules. This lets the custom argument actions access the list
+        # of rules
+        ns = argparse.Namespace()
+        setattr(ns, "_rules", self.all_rules)
+        args = parser.parse_args(args, ns)
 
         Rule.output_format = args.format
 
         return args
-
         
+class ConfigureAction(argparse.Action):
+    def __call__(self, parser, namespace, arg, option_string=None):
+        rulename, argstring = arg.split(":", 1)
+        args = argstring.split(":")
+        for rule in getattr(namespace, "_rules"):
+            if rulename == rule.name:
+                rule.configure(*args)
+                return
+        raise Exception("unknown rule: '%s'" % rulename)
+
+class SetStatusAction(argparse.Action):
+    '''Abstract class which provides a method for checking the rule name'''
+    def check_rule_name(self, rulename, rules):
+        if (rulename != "all" and 
+            rulename.lower() not in [rule.name.lower() for rule in rules]):
+            raise Exception("unknown rule: '%s'" % rulename);
+        
+class SetWarningAction(SetStatusAction):
+    '''Called when the argument parser encounters --warning'''
+    def __call__(self, parser, namespace, rulename, option_string = None):
+
+        self.check_rule_name(rulename, getattr(namespace, "_rules"))
+
+        for rule in getattr(namespace, "_rules"):
+            if rulename == rule.name or rulename == "all":
+                rule.severity = WARNING
+
+class SetErrorAction(SetStatusAction):
+    '''Called when the argument parser encounters --error'''
+    def __call__(self, parser, namespace, rulename, option_string = None):
+
+        self.check_rule_name(rulename, getattr(namespace, "_rules"))
+
+        for rule in getattr(namespace, "_rules"):
+            if rulename == rule.name or rulename == "all":
+                rule.severity = ERROR
+
+
+class SetIgnoreAction(SetStatusAction):
+    '''Called when the argument parser encounters --ignore'''
+    def __call__(self, parser, namespace, rulename, option_string = None):
+
+        self.check_rule_name(rulename, getattr(namespace, "_rules"))
+
+        for rule in getattr(namespace, "_rules"):
+            if rulename == rule.name or rulename == "all":
+                rule.severity = IGNORE
+
+class ArgfileLoader(argparse.Action):
+    '''Called when the argument parser encounters --argumentfile'''
+    def __call__ (self, parser, namespace, values, option_string = None):
+        ap = ArgFileParser(["--argumentfile","-A"])
+        args = ap.process(["-A", values])
+        parser.parse_args(args, namespace)
