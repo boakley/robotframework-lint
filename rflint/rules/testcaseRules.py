@@ -57,4 +57,26 @@ class RequireTestDocumentation(TestRule):
         # set the line number to the line immediately after the testcase name
         self.report(testcase, "No testcase documentation", testcase.linenumber+1)
 
-            
+class TooManyTestSteps(TestRule):
+    '''Workflow tests should have no more than ten steps.
+
+    https://code.google.com/p/robotframework/wiki/HowToWriteGoodTestCases#Workflow_tests
+    '''
+
+    severity=WARNING
+    max_allowed = 10
+
+    def configure(self, max_allowed):
+        self.max_allowed = int(max_allowed)
+
+    def apply(self, testcase):
+        if testcase.is_templated:
+            return
+
+        # ignore empty test steps
+        steps = [step for step in testcase.steps if not (len(step) == 1
+                                                         and not step[0])]
+        if len(steps) > self.max_allowed:
+            self.report(testcase,
+                        "Too many steps (%s) in test case" % len(steps),
+                        testcase.linenumber)

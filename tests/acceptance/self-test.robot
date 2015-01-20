@@ -20,6 +20,7 @@
 | tests/acceptance/rules/DuplicateKeywordNames.robot     | 0
 | tests/acceptance/rules/PeriodInSuiteName.robot         | 0
 | tests/acceptance/rules/PeriodInTestName.robot          | 0
+| tests/acceptance/rules/TooManyTestSteps.robot          | 0
 | tests/acceptance/rules/LineTooLong.robot               | 0
 
 *** Keywords ***
