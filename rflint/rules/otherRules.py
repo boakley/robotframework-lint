@@ -46,3 +46,22 @@ class TrailingBlankLines(GeneralRule):
                 linenumber = numlines-count
                 self.report(robot_file, message, linenumber+self.max_allowed, 0)
 
+
+class FileTooLong(GeneralRule):
+    '''Verify the file has fewer lines than a given threshold.
+
+    You can configure the maximum number of lines. The default is 300.
+    '''
+
+    severity = WARNING
+    max_allowed = 300
+
+    def configure(self, max_allowed):
+        self.max_allowed = int(max_allowed)
+
+    def apply(self, robot_file):
+        lines = robot_file.raw_text.split("\n")
+        if len(lines) > self.max_allowed:
+            message = "File has too many lines (%s)" % len(lines)
+            linenumber = self.max_allowed+1
+            self.report(robot_file, message, linenumber, 0)
