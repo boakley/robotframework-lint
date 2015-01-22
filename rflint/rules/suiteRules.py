@@ -79,3 +79,32 @@ class RequireSuiteDocumentation(SuiteRule):
 
         self.report(suite, "No suite documentation", linenum)
             
+class TooManyTestCases(SuiteRule):
+    '''
+    Should not have too many tests (max 10) in one suite.
+
+    The exception is if they are data-driven.
+
+    https://code.google.com/p/robotframework/wiki/HowToWriteGoodTestCases#Test_suite_structure
+
+    '''
+    severity = WARNING
+    max_allowed = 10
+
+    def configure(self, max_allowed):
+        self.max_allowed = int(max_allowed)
+
+    def apply(self, suite):
+        # check for template (data-driven tests)
+        for table in suite.tables:
+            if isinstance(table, SettingTable):
+                for row in table.rows:
+                    if row[0].lower() == "test template":
+                        return
+        # we didn't find a template, so these aren't data-driven
+        testcases = list(suite.testcases)
+        if len(testcases) > self.max_allowed:
+            self.report(
+                suite, "Too many test cases (%s > %s) in test suite"
+                % (len(testcases), self.max_allowed), testcases[0].linenumber
+            )
