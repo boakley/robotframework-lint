@@ -81,12 +81,13 @@ class RequireSuiteDocumentation(SuiteRule):
             
 class TooManyTestCases(SuiteRule):
     '''
-    Should not have too many tests (max 10) in one suite.
+    Should not have too many tests in one suite. 
 
     The exception is if they are data-driven.
 
     https://code.google.com/p/robotframework/wiki/HowToWriteGoodTestCases#Test_suite_structure
 
+    You can configure the maximum number of tests. The default is 10. 
     '''
     severity = WARNING
     max_allowed = 10
@@ -106,5 +107,5 @@ class TooManyTestCases(SuiteRule):
         if len(testcases) > self.max_allowed:
             self.report(
                 suite, "Too many test cases (%s > %s) in test suite"
-                % (len(testcases), self.max_allowed), testcases[0].linenumber
+                % (len(testcases), self.max_allowed), testcases[self.max_allowed].linenumber
             )
