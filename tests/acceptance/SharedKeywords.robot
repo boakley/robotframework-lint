@@ -19,6 +19,7 @@
 | | ... | --format | {severity}: {linenumber}, {char}: {message} ({rulename})
 | | ... | @{options}
 | | Set test variable | ${result}
+| | 
 | | log | stdout: ${result.stdout} | DEBUG
 | | log | stderr: ${result.stderr} | DEBUG
 
@@ -94,3 +95,25 @@
 | | | Should not contain match | ${lines} | ${pattern}
 | | | ... | stdout should not contain '${pattern}' but it did:\n${result.stdout}
 | | | ... | values=False
+
+| Stdout should be
+| | [Arguments] | @{lines}
+| | [Documentation] 
+| | ... | Verify that stdout of rflint matches the given set of lines.
+| | ... | All arguments are joined together with newlines
+| | 
+| | ${expected}= | Catenate | SEPARATOR=\n | @{lines}
+| | Should be equal | ${result.stdout} | ${expected}
+| | ... | Unexpected output on stdout.\nExpected:\n${expected}\nActual:\n${result.stdout}
+| | ... | values=False
+
+| Stderr should be
+| | [Arguments] | @{lines}
+| | [Documentation] 
+| | ... | Verify that stderr of rflint matches the given set of lines.
+| | ... | All arguments are joined together with newlines
+| | 
+| | ${expected}= | Catenate | SEPARATOR=\n | @{lines}
+| | Should be equal | ${result.stderr} | ${expected}
+| | ... | Unexpected output on stderr. \nExpected:\n${expected}\nActual:\n${result.stderr}
+| | ... | values=False

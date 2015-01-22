@@ -1,11 +1,11 @@
 *** Settings ***
-| Documentation 
+| Documentation
 | ... | A collection of tests for the rflint keyword object
 | #
 | Library     | Collections
 | Resource    | UnitTestResources.robot
 | #
-| Suite Setup | Run Keywords 
+| Suite Setup | Run Keywords
 | ... | Parse a robot file and save as a suite variable
 | ... | AND | Set suite variable | ${keyword_table} | ${rf.tables[4]}
 

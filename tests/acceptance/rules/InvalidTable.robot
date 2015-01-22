@@ -2,7 +2,7 @@
 | Documentation | Tests for the rule 'InvalidTable'
 | Resource      | tests/acceptance/SharedKeywords.robot
 | #
-| Test Teardown 
+| Test Teardown
 | ... | # provide some debugging information if things go bad
 | ... | Run keyword if | "${TEST STATUS}" == "FAIL"
 | ... | log | ${result.stdout}\n${result.stderr}
@@ -16,7 +16,7 @@
 | | 
 | | [Setup] | Run rf-lint with the following options:
 | | ... | --no-filename
-| | ... | --ignore | all 
+| | ... | --ignore | all
 | | ... | --error  | InvalidTable
 | | ... | test_data/acceptance/rules/InvalidTable_Data.robot
 | | 
@@ -31,7 +31,7 @@
 | | 
 | | [Setup] | Run rf-lint with the following options:
 | | ... | --no-filename
-| | ... | --ignore | all 
+| | ... | --ignore | all
 | | ... | --error  | InvalidTable
 | | ... | test_data/acceptance/rules/InvalidTable_Data.robot
 | | 

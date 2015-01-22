@@ -1,11 +1,11 @@
 *** Settings ***
-| Documentation 
+| Documentation
 | ... | A collection of tests for the rflint testcase object
-| # 
+| #
 | Library     | Collections
 | Resource    | UnitTestResources.robot
-| # 
-| Suite Setup | Run Keywords 
+| #
+| Suite Setup | Run Keywords
 | ... | Parse a robot file and save as a suite variable
 | ... | AND | Set suite variable | ${testcase_table} | ${rf.tables[2]}
 
@@ -20,7 +20,7 @@
 | | ... | Fail if the parsed testcase has the wrong number of rows
 | | 
 | | # N.B. using the template lets all keywords run even when some fail
-| | [Template] | Run keyword 
+| | [Template] | Run keyword
 | | Verify test case 0 has 8 rows
 | | Verify test case 1 has 5 rows
 | | Verify test case 2 has 5 rows

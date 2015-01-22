@@ -23,17 +23,22 @@
 | | [Template] | Run keyword
 | | Length should be | ${rf.tables} | 5
 | | ... | Expected to find 5 tables but did not (see test teardown for more information)
-| | Should be equal as strings | ${rf.tables[0].__class__} | <class 'rflint.parser.tables.SettingTable'>
-| | Should be equal as strings | ${rf.tables[1].__class__} | <class 'rflint.parser.tables.VariableTable'>
-| | Should be equal as strings | ${rf.tables[2].__class__} | <class 'rflint.parser.parser.TestcaseTable'>
-| | Should be equal as strings | ${rf.tables[3].__class__} | <class 'rflint.parser.tables.UnknownTable'>
-| | Should be equal as strings | ${rf.tables[4].__class__} | <class 'rflint.parser.parser.KeywordTable'>
-| | 
+| | Should be equal as strings
+| | ... | ${rf.tables[0].__class__} | <class 'rflint.parser.tables.SettingTable'>
+| | Should be equal as strings
+| | ... | ${rf.tables[1].__class__} | <class 'rflint.parser.tables.VariableTable'>
+| | Should be equal as strings
+| | ... | ${rf.tables[2].__class__} | <class 'rflint.parser.parser.TestcaseTable'>
+| | Should be equal as strings
+| | ... | ${rf.tables[3].__class__} | <class 'rflint.parser.tables.UnknownTable'>
+| | Should be equal as strings
+| | ... | ${rf.tables[4].__class__} | <class 'rflint.parser.parser.KeywordTable'>
+| |
 | | [Teardown] | Run keyword if | "${Test Status}" == "FAIL"
 | | ... | Log list | ${rf.tables}
 
 | Tables have expected number of rows
-| | [Documentation] 
+| | [Documentation]
 | | ... | Verify that each table has the expected number of rows
 | | ... |
 | | ... | Note: the parser doesn't keep track of rows in a testcase or
@@ -42,8 +47,8 @@
 | | ... | variables and bogus tables
 | | ... |
 | | ... | Also, the parser treats blank lines as rows, so the number of
-| | ... | rows needs to account for trailing blank lines. 
-| | 
+| | ... | rows needs to account for trailing blank lines.
+| |
 | | [Template] | Run keyword
 | | Verify table 0 has 8 rows
 | | Verify table 1 has 5 rows
@@ -53,13 +58,13 @@
 | Verify table ${table_num} has ${expected} rows
 | | [Documentation]
 | | ... | Fail if the given table doesn't have the correct number of rows
-| | 
+| |
 | | ${table}= | Set variable | ${rf.tables[${table_num}]}
 | | ${actual}= | Get length | ${table.rows}
 | | Should be equal as numbers | ${actual} | ${expected}
-| | ... | Expected '${table.name}' to  have ${expected} rows but it had ${actual} (see teardown for more info)
+| | ... | Expected '${table.name}' to  have ${expected} rows but it had ${actual}
 | | ... | values=False
-| | 
+| |
 | | [Teardown] | Run keyword if | "${Keyword Status}" == "FAIL"
 | | ... | log list | ${table.rows}
 
