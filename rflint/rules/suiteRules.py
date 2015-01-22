@@ -89,6 +89,10 @@ class TooManyTestCases(SuiteRule):
 
     '''
     severity = WARNING
+    max_allowed = 10
+
+    def configure(self, max_allowed):
+        self.max_allowed = int(max_allowed)
 
     def apply(self, suite):
         # check for template (data-driven tests)
@@ -99,6 +103,8 @@ class TooManyTestCases(SuiteRule):
                         return
         # we didn't find a template, so these aren't data-driven
         testcases = list(suite.testcases)
-        if len(testcases) > 10:
-            self.report(suite, "Too many test cases (%s) in test suite" % len(
-                testcases), testcases[0].linenumber)
+        if len(testcases) > self.max_allowed:
+            self.report(
+                suite, "Too many test cases (%s > %s) in test suite"
+                % (len(testcases), self.max_allowed), testcases[0].linenumber
+            )

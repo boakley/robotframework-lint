@@ -35,3 +35,33 @@
 | | rflint return code should be | 0
 | | rflint should report 0 errors
 | | rflint should report 0 warnings
+
+| Test suite WITH too many test cases after configuration
+| | [Documentation]
+| | ... | Verify that a test suite with too many test cases triggers the rule.
+| |
+| | [Setup] | Run rf-lint with the following options:
+| | ... | --no-filename
+| | ... | --ignore | all
+| | ... | --error  | TooManyTestCases
+| | ... | --configure  | TooManyTestCases:1
+| | ... | test_data/acceptance/rules/TooManyTestCases.robot
+| |
+| | rflint return code should be | 1
+| | rflint should report 1 errors
+| | rflint should report 0 warnings
+
+| Testcase WITHOUT too many test cases after configuration
+| | [Documentation]
+| | ... | Verify that a test suite without too many test cases does NOT trigger the rule.
+| |
+| | [Setup] | Run rf-lint with the following options:
+| | ... | --no-filename
+| | ... | --ignore | all
+| | ... | --error  | TooManyTestCases
+| | ... | --configure  | TooManyTestCases:20
+| | ... | test_data/acceptance/rules/TooManyTestCases.robot
+| |
+| | rflint return code should be | 0
+| | rflint should report 0 errors
+| | rflint should report 0 warnings
