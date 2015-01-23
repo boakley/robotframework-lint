@@ -43,6 +43,22 @@
 | | rflint should report 1 errors
 | | rflint should report 0 warnings
 
+| Verify correct linenumber is displayed
+| | [Documentation]
+| | ... | Verify that the reported line number points to the Nth step
+| | ... |
+| | ... | ie: if the max is 10, the error should point to the start
+| | ... | of the 11th step.
+| |
+| | [Setup] | Run rf-lint with the following options:
+| | ... | --no-filename
+| | ... | --ignore | all
+| | ... | --error  | TooManyTestSteps
+| | ... | test_data/acceptance/rules/TooManyTestSteps.robot
+| |
+| | Output should contain
+| | ... | E: 19, 0: Too many steps (15) in test case (TooManyTestSteps)
+
 | Testcase WITHOUT too many test steps after configuration
 | | [Documentation]
 | | ... | Verify that a testcase with too many test steps triggers the rule.

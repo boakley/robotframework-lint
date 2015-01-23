@@ -79,4 +79,4 @@ class TooManyTestSteps(TestRule):
         if len(steps) > self.max_allowed:
             self.report(testcase,
                         "Too many steps (%s) in test case" % len(steps),
-                        testcase.linenumber)
+                        steps[self.max_allowed].startline)
