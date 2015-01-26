@@ -1,3 +1,6 @@
+# N.B. to push a new version to PyPi, update the version number
+# in rflint/version.py and then run 'python setup.py sdist upload'
+
 from setuptools import setup
 
 execfile('rflint/version.py')
@@ -16,13 +19,14 @@ setup(
     include_package_data = True,
     install_requires = ['robotframework'],
     classifiers      = [
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 4 - Beta",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Topic :: Software Development :: Testing",
         "Topic :: Software Development :: Quality Assurance",
         "Intended Audience :: Developers",
+        "Environment :: Console",
         ],
     packages         =[
         'rflint',

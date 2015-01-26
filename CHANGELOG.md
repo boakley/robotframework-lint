@@ -1,5 +1,29 @@
 # Change Log
 
+## 0.5 - 2014-01-26
+
+### New rules
+- Configurable rules
+- New General rules:
+  - LineTooLong
+  - FileTooLong
+  - TrailingBlankLines
+- New testcase rules
+  - TooManySteps (provided by guykisel)
+  - TooManyTestCases (provided by guykisel)
+
+### Issues closed
+- issue #22 - FileTooLong rule
+- issue #19 - rules should accept arguments
+- issue #5  - "bare" comments are not parsed properly
+
+### Other changes
+- Rflint now distinguishes between resource files and test suites
+  by checking whether the file has a testcase table or not
+- General rules now have access to the raw text of a file, so
+  they can do their own parsing if they want (issue #5)
+
+
 ## 0.4 - 2014-12-22
 
 ### New rules
@@ -12,8 +36,6 @@
   - PeriodInTestName
 
 ### Issues closed:
-- a warning is written to stderr if you give a file that doesn't exist
-- a warning is written to stderr if a file file can't be imported
 - issue #1  - Add -A/--argumentfile
 - issue #2  - Need verbose option for --list
 - issue #3  - --list output includes unnecessary quotes
