@@ -113,28 +113,6 @@ class RobotFile(object):
     def __repr__(self):
         return "<RobotFile(%s)>" % self.path
 
-    @property 
-    def warnings(self):
-        '''This isn't fully working. The idea is to return all parse errors
-        I need to create a Warning or ParseError class that has
-        line numbers and warning messages and whatnot. Or do I?
-        '''
-        warnings = []
-        for table in self.tables:
-            if isinstance(table, UnknownTable):
-                warnings.append([table.linenumber, "unknown table '%s'" % table.name])
-            if table.type is None:
-                # line number, column number, message
-                # line numbers start at 1, columns start at zero. 
-                warnings.append([1, 0, "no testcases or keywords"])
-
-#        for table in self.tables:
-#            warnings += table.warnings
-#            # where table.warnings might do:
-#            # for testcase in table.testcases:
-#            #     warnings += testcase.warnings
-        return warnings
-            
     @property
     def type(self):
         '''Return 'suite' or 'resource' or None
@@ -270,9 +248,6 @@ if __name__ == "__main__":
         
     suite1 = test_robot()
     suite2 = test_mine()
-    import pdb; pdb.set_trace()
-
-    print suite2.warnings
 
 #    tc = [x for x in suite2.testcases][0]
 #    import pdb; pdb.set_trace()
