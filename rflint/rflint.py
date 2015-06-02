@@ -37,22 +37,44 @@ class RfLint(object):
         here = os.path.abspath(os.path.dirname(__file__))
         builtin_rules = os.path.join(here, "rules")
         site_rules = os.path.join(here, "site-rules")
+
+        # mapping of class names to instances, to enable us to
+        # instantiate each rule exactly once
+        self._rules = {}
+
         for path in (builtin_rules, site_rules):
             for filename in glob.glob(path+"/*.py"):
                 if filename.endswith(".__init__.py"):
                     continue
                 self._load_rule_file(filename)
 
+    @property
+    def suite_rules(self):
+        return self._get_rules(SuiteRule)
+
+    @property 
+    def resource_rules(self):
+        return self._get_rules(ResourceRule)
+
+    @property
+    def testcase_rules(self):
+        return self._get_rules(TestRule)
+
+    @property
+    def keyword_rules(self):
+        return self._get_rules(KeywordRule)
+
+    @property
+    def general_rules(self):
+        return self._get_rules(GeneralRule)
+
+    @property
+    def all_rules(self):
+        all = self.suite_rules + self.testcase_rules + self.keyword_rules + self.general_rules
+        return all
+
     def run(self, args):
         """Parse command line arguments, and run rflint"""
-
-        self.suite_rules = self._get_rules(SuiteRule)
-        self.resource_rules = self._get_rules(ResourceRule)
-        self.testcase_rules = self._get_rules(TestRule)
-        self.keyword_rules = self._get_rules(KeywordRule)
-        self.general_rules = self._get_rules(GeneralRule)
-
-        self.all_rules = self.suite_rules + self.testcase_rules + self.keyword_rules + self.general_rules
 
         self.args = self.parse_and_process_args(args)
 
@@ -131,10 +153,7 @@ class RfLint(object):
 
     def list_rules(self):
         """Print a list of all rules"""
-        all_rules = self.suite_rules + self.resource_rules + \
-                    self.testcase_rules + self.keyword_rules + self.general_rules
-
-        for rule in sorted(all_rules, key=lambda rule: rule.name):
+        for rule in sorted(self.all_rules, key=lambda rule: rule.name):
             print rule
             if self.args.verbose:
                 for line in rule.doc.split("\n"):
@@ -158,12 +177,19 @@ class RfLint(object):
                                       severity=severity, message=message,
                                       rulename = rulename, char=char)
     def _get_rules(self, cls):
-        """Returns a list of rules of a given class"""
+        """Returns a list of rules of a given class
+        
+        Rules are treated as singletons - we only instantiate each
+        rule once. 
+        """
+
         result = []
         for rule_class in cls.__subclasses__():
             rule_name = rule_class.__name__.lower()
-            result.append(rule_class(self))
-
+            if rule_name not in self._rules:
+                rule = rule_class(self)
+                self._rules[rule_name] = rule
+            result.append(self._rules[rule_name])
         return result
 
     def _load_rule_file(self, filename):
@@ -227,7 +253,7 @@ class RfLint(object):
                             help="Configure a rule")
         parser.add_argument("--recursive", "-r", action="store_true", default=False,
                             help="Recursively scan subfolders in a directory")
-        parser.add_argument("--rulefile", "-R", action="append",
+        parser.add_argument("--rulefile", "-R", action=RulefileAction,
                             help="import additional rules from the given RULEFILE")
         parser.add_argument("--argumentfile", "-A", action=ArgfileLoader,
                             help="read arguments from the given file")
@@ -237,18 +263,25 @@ class RfLint(object):
         # our rules. This lets the custom argument actions access the list
         # of rules
         ns = argparse.Namespace()
-        setattr(ns, "_rules", self.all_rules)
+        setattr(ns, "app", self)
         args = parser.parse_args(args, ns)
 
         Rule.output_format = args.format
 
         return args
         
+class RulefileAction(argparse.Action):
+    def __call__(self, parser, namespace, arg, option_string=None):
+        app = getattr(namespace, "app")
+        app._load_rule_file(arg)
+
 class ConfigureAction(argparse.Action):
     def __call__(self, parser, namespace, arg, option_string=None):
         rulename, argstring = arg.split(":", 1)
         args = argstring.split(":")
-        for rule in getattr(namespace, "_rules"):
+        app = getattr(namespace, "app")
+
+        for rule in app.all_rules:
             if rulename == rule.name:
                 rule.configure(*args)
                 return
@@ -265,9 +298,10 @@ class SetWarningAction(SetStatusAction):
     '''Called when the argument parser encounters --warning'''
     def __call__(self, parser, namespace, rulename, option_string = None):
 
-        self.check_rule_name(rulename, getattr(namespace, "_rules"))
+        app = getattr(namespace, "app")
+        self.check_rule_name(rulename, app.all_rules)
 
-        for rule in getattr(namespace, "_rules"):
+        for rule in app.all_rules:
             if rulename == rule.name or rulename == "all":
                 rule.severity = WARNING
 
@@ -275,9 +309,10 @@ class SetErrorAction(SetStatusAction):
     '''Called when the argument parser encounters --error'''
     def __call__(self, parser, namespace, rulename, option_string = None):
 
-        self.check_rule_name(rulename, getattr(namespace, "_rules"))
+        app = getattr(namespace, "app")
+        self.check_rule_name(rulename, app.all_rules)
 
-        for rule in getattr(namespace, "_rules"):
+        for rule in app.all_rules:
             if rulename == rule.name or rulename == "all":
                 rule.severity = ERROR
 
@@ -286,9 +321,10 @@ class SetIgnoreAction(SetStatusAction):
     '''Called when the argument parser encounters --ignore'''
     def __call__(self, parser, namespace, rulename, option_string = None):
 
-        self.check_rule_name(rulename, getattr(namespace, "_rules"))
+        app = getattr(namespace, "app")
+        self.check_rule_name(rulename, app.all_rules)
 
-        for rule in getattr(namespace, "_rules"):
+        for rule in app.all_rules:
             if rulename == rule.name or rulename == "all":
                 rule.severity = IGNORE
 

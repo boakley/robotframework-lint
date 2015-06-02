@@ -61,3 +61,17 @@
 | | ... | W: 1, 0: No suite documentation (RequireSuiteDocumentation)
 | | ... | + test_data/acceptance/nodoc.robot
 | | ... | W: 1, 0: No suite documentation (RequireSuiteDocumentation)
+
+| Rulefile option
+| | [Documentation]
+| | ... | Verify that rules in a rulefile are listed
+| |
+| | Run rf-lint with the following options:
+| | ... | --rulefile | test_data/acceptance/customRules.py
+| | ... | --list
+| | Stderr should be | ${EMPTY}
+| | Output should contain
+| | ... | W CustomTestRule
+| | ... | W CustomSuiteRule
+| | ... | W CustomGeneralRule
+| | ... | W CustomKeywordRule
