@@ -122,8 +122,7 @@ class RobotFile(object):
         is found. If no tables are found it will return None
         '''
         
-        robot_tables = [table for table in self.tables if table.type is not None]
-        if len(robot_tables) == 0:
+        if len(self.tables) == 0:
             # no robot tables were found
             return None
 
