@@ -25,8 +25,8 @@ import imp
 
 from .common import SuiteRule, ResourceRule, TestRule, KeywordRule, GeneralRule, Rule
 from .common import ERROR, WARNING, IGNORE
-from version import __version__
-from parser import RobotFileFactory, SuiteFile, ResourceFile
+from .version import __version__
+from .parser import RobotFileFactory, SuiteFile, ResourceFile
 
 from robot.utils.argumentparser import ArgFileParser
 
@@ -70,7 +70,7 @@ class RfLint(object):
 
     @property
     def all_rules(self):
-        all = self.suite_rules + self.testcase_rules + self.keyword_rules + self.general_rules
+        all = self.suite_rules + self.resource_rules + self.testcase_rules + self.keyword_rules + self.general_rules
         return all
 
     def run(self, args):
