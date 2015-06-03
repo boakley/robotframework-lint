@@ -2,7 +2,7 @@
 | Documentation
 | ... | This suite includes tests for specific issues in the issue tracker
 | #
-| Resource   | SharedKeywords.robot
+| Resource   | ../SharedKeywords.robot
 | #
 | Test Teardown
 | ... | # provide some debugging information if things go bad
@@ -12,7 +12,7 @@
 *** Test Cases ***
 | Issue 31
 | | [tags] | issue-31
-| | [Documentation]
+| | [Documentation] | 
 | | ... | Verify that GeneralRule is passed an object with a type attribute
 | |
 | | Run rf-lint with the following options:
@@ -28,5 +28,3 @@
 | | ... | W: 1, 0: the type is suite (Issue31)
 | | ... | + test_data/keywords.robot
 | | ... | W: 1, 0: the type is resource (Issue31)
-
-
