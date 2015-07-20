@@ -75,3 +75,25 @@
 | | ... | W CustomSuiteRule
 | | ... | W CustomGeneralRule
 | | ... | W CustomKeywordRule
+
+| The --describe option with one named rule
+| | [Documentation]
+| | ... | Verify that --describe works
+| | Run rf-lint with the following options:
+| | ... | --describe | InvalidTable
+| | rflint return code should be | 0
+| | Stderr should be | ${EMPTY}
+| | Stdout should be
+| | ... | InvalidTable
+| | ... | ${SPACE*4}Verify that there are no invalid table headers
+
+| The --describe option with invalid rule name
+| | [tags] | foo
+| | [Documentation]
+| | ... | Verify that rflint --describe fails if given unknown rule name
+| | Run rf-lint with the following options:
+| | ... | --describe | BogusRule
+| | rflint return code should be | 1
+| | Stderr should be | 
+| | ... | unknown rule: 'BogusRule'
+| | Stdout should be | ${EMPTY}
