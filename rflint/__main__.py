@@ -8,7 +8,7 @@ def main(args=None):
         return result
 
     except Exception, e:
-        print str(e)
+        sys.stderr.write(str(e) + "\n")
         return 1
 
 if __name__ == "__main__":
