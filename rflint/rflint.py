@@ -1,7 +1,7 @@
 """
 rflint - a lint-like tool for robot framework plain text files
 
-Copyright 2014 Bryan Oakley
+Copyright 2014-2015 Bryan Oakley
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -90,12 +90,12 @@ class RfLint(object):
             self.list_rules()
             return 0
         
+        if self.args.describe:
+            self._describe_rules(self.args.args)
+            return 0
+
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
             
-        # _current_filename is used to track when we should print the
-        # filename and when we shouldn't
-        self._current_filename = None
-
         for filename in self.args.args:
             if not (os.path.exists(filename)):
                 sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
@@ -109,6 +109,24 @@ class RfLint(object):
             return self.counts[ERROR] if self.counts[ERROR] < 254 else 255
 
         return 0
+
+    def _is_valid_rule(self, rule_name):
+        for rule in self.all_rules:
+            if rule_name.lower() == rule.name.lower():
+                return True
+        return False
+
+    def _describe_rules(self, rule_names):
+        for rulename in rule_names:
+            if not self._is_valid_rule(rulename):
+                raise Exception("unknown rule: '%s'" % rulename)
+
+        requested_rules = [rule.strip().lower() for rule in rule_names]
+        for rule in sorted(self.all_rules, key=lambda rule: rule.name):
+            if rule.name.lower() in requested_rules or len(requested_rules) == 0:
+                print rule.name
+                for line in rule.doc.split("\n"):
+                    print "    " + line
 
     def _process_folder(self, path):
         for root, dirs, files in os.walk(path):
@@ -239,6 +257,8 @@ class RfLint(object):
                             help="Assign a severity of WARNING for the given RULENAME")
         parser.add_argument("--list", "-l", action="store_true",
                             help="show a list of known rules and exit")
+        parser.add_argument("--describe", "-d", action="store_true",
+                            help="describe the given ruless")
         parser.add_argument("--no-filenames", action="store_false", dest="print_filenames", 
                             default=True,
                             help="suppress the printing of filenames")
