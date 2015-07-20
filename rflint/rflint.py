@@ -27,6 +27,7 @@ from .common import SuiteRule, ResourceRule, TestRule, KeywordRule, GeneralRule,
 from .common import ERROR, WARNING, IGNORE
 from .version import __version__
 from .parser import RobotFactory, SuiteFile, ResourceFile
+from .exceptions import UnknownRuleException
 
 from robot.utils.argumentparser import ArgFileParser
 
@@ -119,7 +120,7 @@ class RfLint(object):
     def _describe_rules(self, rule_names):
         for rulename in rule_names:
             if not self._is_valid_rule(rulename):
-                raise Exception("unknown rule: '%s'" % rulename)
+                raise UnknownRuleException(rulename)
 
         requested_rules = [rule.strip().lower() for rule in rule_names]
         for rule in sorted(self.all_rules, key=lambda rule: rule.name):
@@ -305,14 +306,14 @@ class ConfigureAction(argparse.Action):
             if rulename == rule.name:
                 rule.configure(*args)
                 return
-        raise Exception("unknown rule: '%s'" % rulename)
+        raise UnknownRuleException(rulename)
 
 class SetStatusAction(argparse.Action):
     '''Abstract class which provides a method for checking the rule name'''
     def check_rule_name(self, rulename, rules):
         if (rulename != "all" and 
             rulename.lower() not in [rule.name.lower() for rule in rules]):
-            raise Exception("unknown rule: '%s'" % rulename);
+            raise UnknownRuleException(rulename)
         
 class SetWarningAction(SetStatusAction):
     '''Called when the argument parser encounters --warning'''
