@@ -26,7 +26,7 @@ import imp
 from .common import SuiteRule, ResourceRule, TestRule, KeywordRule, GeneralRule, Rule
 from .common import ERROR, WARNING, IGNORE
 from .version import __version__
-from .parser import RobotFileFactory, SuiteFile, ResourceFile
+from .parser import RobotFactory, SuiteFile, ResourceFile
 
 from robot.utils.argumentparser import ArgFileParser
 
@@ -127,7 +127,7 @@ class RfLint(object):
         # we process the next file.
         self._print_filename = filename if self.args.print_filenames else None
 
-        robot_file = RobotFileFactory(filename)
+        robot_file = RobotFactory(filename)
         for rule in self.general_rules:
             if rule.severity != IGNORE:
                 rule.apply(robot_file)
