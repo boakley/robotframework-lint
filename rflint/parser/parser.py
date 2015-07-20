@@ -1,9 +1,11 @@
 '''
-A custom robotframework parser that retains line numbers (though
-it doesn't retain character positions for each cell)
 
-Note: this only works on pipe-separated files. It uses part of
-the TxtReader robot parser to divide a line into cells. 
+A custom robotframework parser that retains line numbers (though
+it doesn't (yet!) retain character positions for each cell)
+
+
+Note: this only works on pipe and space separated files. It uses part
+of the TxtReader robot parser to divide a line into cells.
 
 (probably works for space-separated too. I haven't tried. )
 
@@ -21,37 +23,100 @@ import os.path
 from robot.parsing.txtreader import TxtReader
 from robot.errors import DataError
 from robot.utils import Utf8Reader
-from util import timeit, Matcher
-from tables import *
-from testcase import Testcase
-from rfkeyword import Keyword
-from common import Row, Statement
+from .util import timeit, Matcher
+from .tables import AbstractContainerTable, DefaultTable, SettingTable, VariableTable, UnknownTable
+from .testcase import Testcase
+from .rfkeyword import Keyword
+from .common import Row, Statement
 
-def RobotFileFactory(path, parent=None):
-    '''Return an instance of SuiteFile or ResourceFile
+def RobotFactory(path, parent=None):
+    '''Return an instance of SuiteFile, ResourceFile, SuiteFolder
 
-    Exactly which is returned depends on the contents of the
-    file. If there is a testcase table, this will return an
-    instance of SuiteFile, otherwise it will return an
-    instance of ResourceFile.
+    Exactly which is returned depends on whether it's a file or
+    folder, and if a file, the contents of the file. If there is a
+    testcase table, this will return an instance of SuiteFile,
+    otherwise it will return an instance of ResourceFile.
     '''
-    rf = RobotFile(path, parent)
 
-    for table in rf.tables:
-        if isinstance(table, TestcaseTable):
-            rf.__class__ = SuiteFile
-            return rf
+    if os.path.isdir(path):
+        return SuiteFolder(path, parent)
 
-    rf.__class__ = ResourceFile
-    return rf
+    else:
+        rf = RobotFile(path, parent)
+
+        for table in rf.tables:
+            if isinstance(table, TestcaseTable):
+                rf.__class__ = SuiteFile
+                return rf
+
+        rf.__class__ = ResourceFile
+        return rf
     
+class SuiteFolder(object):
+    def __init__(self, path, parent=None):
+        
+        self.path = os.path.abspath(path)
+        self.parent = parent
+        self.name = os.path.splitext(os.path.basename(path))[0]
+        self.initfile = None
+
+        # see if there's an initialization file. If so,
+        # attempt to load it
+        for filename in ("__init__.robot", "__init__.txt"):
+            if os.path.exists(os.path.join(self.path, filename)):
+                self.initfile = RobotFile(os.path.join(self.path, filename))
+                break
+
+
+    def walk(self, *types):
+        '''
+        Iterator which visits all suites and suite files,
+        yielding test cases and keywords
+        '''
+        requested = types if len(types) > 0 else [SuiteFile, ResourceFile, SuiteFolder, Testcase, Keyword]
+            
+        for thing in self.robot_files:
+            if thing.__class__ in requested:
+                yield thing
+            if isinstance(thing, SuiteFolder):
+                for child in thing.walk():
+                    if child.__class__ in requested:
+                        yield child
+            else:
+                if Testcase in requested:
+                    for testcase in thing.testcases:
+                        yield testcase
+
+                if Keyword in requested:
+                    for keyword in thing.keywords:
+                        yield keyword
+
+
+    @property
+    def robot_files(self):
+        '''Return a list of all folders, and test suite files (.txt, .robot)
+        '''
+        result = []
+        for name in os.listdir(self.path):
+            fullpath = os.path.join(self.path, name)
+            if os.path.isdir(fullpath):
+                result.append(RobotFactory(fullpath, parent=self))
+            else:
+                if ((name.endswith(".txt") or name.endswith(".robot")) and
+                    (name not in ("__init__.txt", "__init__.robot"))):
+
+                    result.append(RobotFactory(fullpath, parent=self))
+        return result
+
+
 class RobotFile(object):
     '''
     Terminology:
 
     - A file is a set of tables
     - A table begins with a heading and extends to the next table or EOF
-    - Each table may be made up of smaller tables that define test cases or keywords
+    - Each table may be made up of smaller tables that define test cases 
+      or keywords
     - Each line of text in a table becomes a "Row". 
     - A Row object contains a list of cells.
     - A cell is all of the data between pipes, stripped of leading and
@@ -59,7 +124,7 @@ class RobotFile(object):
 
     '''
     def __init__(self, path, parent=None):
-        self.parent = None
+        self.parent = parent
         self.name = os.path.splitext(os.path.basename(path))[0]
         self.path = os.path.abspath(path)
         self.tables = []
@@ -90,7 +155,7 @@ class RobotFile(object):
 
                 # this mimics what the robot TSV reader does --
                 # it replaces non-breaking spaces with regular spaces,
-                # and strips trailing whitespace
+                # and then strips trailing whitespace
                 raw_text = raw_text.replace(u'\xA0', ' ')
                 raw_text = raw_text.rstrip()
 
@@ -122,8 +187,8 @@ class RobotFile(object):
         is found. If no tables are found it will return None
         '''
         
-        if len(self.tables) == 0:
-            # no robot tables were found
+        robot_tables = [table for table in self.tables if not isinstance(table, UnknownTable)]
+        if len(robot_tables) == 0:
             return None
 
         for table in self.tables:
@@ -163,7 +228,7 @@ def tableFactory(parent, linenumber, name):
         table = SettingTable(parent, linenumber, name)
     elif match(r'variables?', name):
         table = VariableTable(parent, linenumber, name)
-    elif match(r'test( cases?)', name):
+    elif match(r'test ?cases?', name):
         table = TestcaseTable(parent, linenumber, name)
     elif match(r'(user )?keywords?', name):
         table = KeywordTable(parent, linenumber, name)
@@ -247,6 +312,3 @@ if __name__ == "__main__":
         
     suite1 = test_robot()
     suite2 = test_mine()
-
-#    tc = [x for x in suite2.testcases][0]
-#    import pdb; pdb.set_trace()
