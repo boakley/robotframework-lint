@@ -1,6 +1,26 @@
 # Change Log
 
-## 0.5 - 2014-01-26
+## 0.6 - 2015-07-21
+
+### New rules
+- TooFewTestSteps
+- TooFewKeywordSteps
+
+### New options
+- "--describe", to describe a particular rule 
+  (eg: '--describe ToFewTestSteps' will show the docstring for that rule)
+
+### Issues closed
+- Issue #24 - InvalidTable isn't catching everything
+- Issue #25 - Rules to detect empty tests and keywords
+- Issue #28 - --rulefile isn't working
+- Issue #30 - When ResourceRule class has configure method, rflint says the rule is unknown.
+- Issue #31 - A GeneralRule class rule is not passed an object with a type attribute
+	
+### Other changes
+- small improvements to the custom parser
+
+## 0.5 - 2015-01-26
 
 ### New rules
 - Configurable rules
