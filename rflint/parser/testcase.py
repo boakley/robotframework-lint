@@ -20,12 +20,6 @@ class Testcase(RobotStatements):
                         return True
         return False
 
-    @property
-    def path(self):
-        # this property exists so that the linter doesn't
-        # have to have this logic 
-        return self.parent.path
-
     # this is great, except that we don't return the line number
     # or character position of each tag. The linter needs that. :-(
     @property 
