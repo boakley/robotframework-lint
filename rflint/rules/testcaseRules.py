@@ -57,6 +57,28 @@ class RequireTestDocumentation(TestRule):
         # set the line number to the line immediately after the testcase name
         self.report(testcase, "No testcase documentation", testcase.linenumber+1)
 
+class TooFewTestSteps(TestRule):
+    '''Tests should have at least a minimum number of steps
+
+    This rule is configurable. The default number of required steps is 2.
+    '''
+
+    min_required = 2
+
+    def configure(self, min_required):
+        self.min_required = int(min_required)
+
+    def apply(self, testcase):
+        if testcase.is_templated:
+            return
+
+        # ignore empty test steps
+        steps = [step for step in testcase.steps if not (len(step) == 1
+                                                         and not step[0])]
+        if len(steps) < self.min_required:
+            msg = "Too few steps (%s) in test case" % len(steps)
+            self.report(testcase, msg,  testcase.linenumber)
+
 class TooManyTestSteps(TestRule):
     '''Workflow tests should have no more than ten steps.
 

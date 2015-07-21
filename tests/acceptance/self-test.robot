@@ -35,8 +35,8 @@
 | | ... | Note: it is assumed that the test name is the path of the file to test
 | | 
 | | Run rf-lint with the following options:
-| | ... | --no-filename
 | | ... | --format | {severity}: {linenumber}, {char}: {message} ({rulename})
+| | ... | --configure | TooFewTestSteps:1
 | | ... | # because the test cases reference filenames, they all have
 | | ... | # periods in their name...
 | | ... | --ignore | PeriodInTestName

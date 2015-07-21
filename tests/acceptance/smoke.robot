@@ -122,12 +122,13 @@
 | | [Setup] | Create a test suite | ${TEMPDIR}/busted.robot
 | | ... | *** Test Cases ***\n
 | | ... | An example test case\n
-| | ... | | # no documentation
+| | ... | | # no documentation\n
 | | ... | | log | hello world
 | |
 | | Run rf-lint with the following options:
-| | ... | --warn | RequireSuiteDocumentation
-| | ... | --error | RequireTestDocumentation
+| | ... | --ignore | all 
+| | ... | --warn   | RequireSuiteDocumentation
+| | ... | --error  | RequireTestDocumentation
 | | ... | ${TEMPDIR}/busted.robot
 | |
 | | # there should be two errors: no suite documentation, no testcase documentation
