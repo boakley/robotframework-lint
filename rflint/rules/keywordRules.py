@@ -28,3 +28,23 @@ class RequireKeywordDocumentation(KeywordRule):
 
         # set the line number to the line immediately after the keyword name
         self.report(keyword, "No keyword documentation", keyword.linenumber+1)
+
+
+class TooFewKeywordSteps(KeywordRule):
+    '''Keywords should have at least a minimum number of steps
+
+    This rule is configurable. The default number of required steps is 2.
+    '''
+
+    min_required = 2
+
+    def configure(self, min_required):
+        self.min_required = int(min_required)
+
+    def apply(self, keyword):
+        # ignore empty steps
+        steps = [step for step in keyword.steps if not (len(step) == 1 and not step[0])]
+        if len(steps) < self.min_required:
+            msg = "Too few steps (%s) in keyword" % len(steps)
+            self.report(keyword, msg, keyword.linenumber)
+
