@@ -6,6 +6,12 @@ class RobotStatements(object):
         self.rows.append(Row(linenumber, raw_text, cells))
 
     @property
+    def path(self):
+        # this property exists so that the linter doesn't
+        # have to have this logic 
+        return self.parent.path
+
+    @property
     def steps(self):
         '''Return a list of steps (statements that are not settings or comments)'''
         steps = []
