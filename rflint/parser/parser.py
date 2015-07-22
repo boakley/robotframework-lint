@@ -124,8 +124,10 @@ class RobotFile(object):
         self.tables = []
         self.rows = []
 
-        self._load(path)
-
+        try:
+            self._load(path)
+        except Exception as e:
+            sys.stderr.write("there was a problem reading '%s': %s\n" % (path, str(e)))
 
     def walk(self, *types):
         '''
@@ -166,7 +168,9 @@ class RobotFile(object):
         current_table = DefaultTable(self)
 
         with Utf8Reader(path) as f:
+            # N.B. the caller should be catching errors
             self.raw_text = f.read()
+
             f._file.seek(0) # bleh; wish this wasn't a private property
             matcher = Matcher(re.IGNORECASE)
             for linenumber, raw_text in enumerate(f.readlines()):
