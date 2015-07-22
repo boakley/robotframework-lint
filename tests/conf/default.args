@@ -11,3 +11,5 @@
 # inputs for some of the tests. We don't want to run
 # them as actual tests
 --exclude test-data 
+
+--tagstatexclude issue-*
