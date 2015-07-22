@@ -1,18 +1,20 @@
 # Change Log
 
+## 0.6.1 - 2015-07-22
+
+- added `walk` method to RobotFile class, that somehow got 
+  left out in the 0.6 version.
+
 ## 0.6 - 2015-07-21
 
 ### New rules
 - TooFewTestSteps
 - TooFewKeywordSteps
 
-### New options
-- "--describe", to describe a particular rule 
-  (eg: '--describe ToFewTestSteps' will show the docstring for that rule)
-
 ### Issues closed
 - Issue #24 - InvalidTable isn't catching everything
 - Issue #25 - Rules to detect empty tests and keywords
+- Issue #27 - add --describe option
 - Issue #28 - --rulefile isn't working
 - Issue #30 - When ResourceRule class has configure method, rflint says the rule is unknown.
 - Issue #31 - A GeneralRule class rule is not passed an object with a type attribute
