@@ -88,7 +88,6 @@
 | | ... | ${SPACE*4}Verify that there are no invalid table headers
 
 | The --describe option with invalid rule name
-| | [tags] | foo
 | | [Documentation]
 | | ... | Verify that rflint --describe fails if given unknown rule name
 | | Run rf-lint with the following options:
