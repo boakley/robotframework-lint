@@ -22,6 +22,7 @@ setup(
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
+        "Framework :: Robot Framework",
         "Programming Language :: Python",
         "Topic :: Software Development :: Testing",
         "Topic :: Software Development :: Quality Assurance",
