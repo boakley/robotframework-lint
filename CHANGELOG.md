@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.7.0 - 2016-03-07
+- fix for issue #30 - preserve table headings
+
 ## 0.6.1 - 2015-07-22
 
 - added `walk` method to RobotFile class, that somehow got 
