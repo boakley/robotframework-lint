@@ -28,6 +28,16 @@ Rules are simple python classes. For more information about how to
 write rules, see the 
 [robotframework-lint wiki](https://github.com/boakley/robotframework-lint/wiki)
 
+Argument files
+--------------
+
+rflint supports argument files much in the same way as robot framework. You can
+put arguments one per line in a file, and reference that file with the option
+`-A` or `--argument-file`.
+
+Argument files are a convenient way to create a set of rules and rule configurations
+that you want to apply to your files.
+
 Examples
 --------
 
