@@ -54,6 +54,17 @@
 | | Verify table 1 has 5 rows
 | | Verify table 3 has 2 rows
 
+| Tables have header information
+| | [Documentation]
+| | ... | Verify that table objects have header information
+| |
+| | Should be equal as strings | ${rf.tables[0].header} | *** Settings ***
+| | Should be equal as strings | ${rf.tables[1].header} | ** Variables
+| | Should be equal as strings | ${rf.tables[2].header} | * Test Cases *
+| | Should be equal as strings | ${rf.tables[3].header} | *** Bogus Table
+| | Should be equal as strings | ${rf.tables[4].header} | * Keywords ***
+
+
 *** Keywords ***
 | Verify table ${table_num} has ${expected} rows
 | | [Documentation]

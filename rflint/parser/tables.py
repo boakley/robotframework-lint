@@ -2,12 +2,13 @@ from common import Statement
 
 class RobotTable(object):
     '''A table made up of zero or more rows'''
-    def __init__(self, parent, linenumber=0, name=None):
+    def __init__(self, parent, linenumber=0, name=None, header=None):
         self.linenumber = linenumber
         self.name = name
         self.rows = []
         self.comments = []
         self.parent = parent
+        self.header = header
 
     def dump(self):
         for row in self.rows:

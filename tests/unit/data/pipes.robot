@@ -1,5 +1,9 @@
 # This test isn't designed to be run, it's used as an input
 # for some unit tests
+#
+# Note: this test intentionally uses different styles for the
+# table headings and there's a test for each style, so modify
+# at your own risk.
 
 *** Settings ***
 | # comment in the settings table
@@ -16,7 +20,7 @@
 | @{bar} | one | two | three
 # whole-line comment in the variables table
 
-*** Test Cases ***
+* Test Cases *
 | Test case #1
 | # comment in a test case
 | | [Documentation] 
@@ -38,10 +42,10 @@
 
 | | No operation
 
-*** Bogus Table ***
+*** Bogus Table
 this table should parse even though the table
 
-*** Keywords ***
+* Keywords ***
 | Keyword #1
 | | [Documentation]
 | | ... | This is the documentation for keyword #1

@@ -193,7 +193,7 @@ class RobotFile(object):
                 if matcher(_heading_regex, cells[0]):
                     # we've found the start of a new table
                     table_name = matcher.group(1)
-                    current_table = tableFactory(self, linenumber, table_name)
+                    current_table = tableFactory(self, linenumber, table_name, raw_text)
                     self.tables.append(current_table)
                 else:
                     current_table.append(Row(linenumber, raw_text, cells))
@@ -243,20 +243,20 @@ class RobotFile(object):
             table.dump()
                 
 
-def tableFactory(parent, linenumber, name):
+def tableFactory(parent, linenumber, name, header):
     match = Matcher(re.IGNORECASE)
     if name is None:
-        table = UnknownTable(parent, linenumber, name)
+        table = UnknownTable(parent, linenumber, name, header)
     elif match(r'settings?|metadata', name):
-        table = SettingTable(parent, linenumber, name)
+        table = SettingTable(parent, linenumber, name, header)
     elif match(r'variables?', name):
-        table = VariableTable(parent, linenumber, name)
+        table = VariableTable(parent, linenumber, name, header)
     elif match(r'test ?cases?', name):
-        table = TestcaseTable(parent, linenumber, name)
+        table = TestcaseTable(parent, linenumber, name, header)
     elif match(r'(user )?keywords?', name):
-        table = KeywordTable(parent, linenumber, name)
+        table = KeywordTable(parent, linenumber, name, header)
     else:
-        table = UnknownTable(parent, linenumber, name)
+        table = UnknownTable(parent, linenumber, name, header)
 
     return table
 
