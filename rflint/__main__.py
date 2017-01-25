@@ -1,5 +1,6 @@
 import sys
-from rflint import RfLint
+from .rflint import RfLint
+
 
 def main(args=None):
     try:
@@ -7,7 +8,7 @@ def main(args=None):
         result = app.run(args)
         return result
 
-    except Exception, e:
+    except Exception as e:
         sys.stderr.write(str(e) + "\n")
         return 1
 

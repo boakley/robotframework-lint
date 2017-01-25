@@ -1,4 +1,6 @@
-from common import Statement
+from __future__ import print_function
+
+from .common import Statement
 
 class RobotTable(object):
     '''A table made up of zero or more rows'''
@@ -12,7 +14,7 @@ class RobotTable(object):
 
     def dump(self):
         for row in self.rows:
-            print "| " + " | ".join(row)
+            print("| " + " | ".join(row))
 
     def append(self, row):
         self.rows.append(row)
@@ -87,7 +89,7 @@ class AbstractContainerTable(RobotTable):
 
     def dump(self):
         for child in self._children:
-            print "| " + child.name
+            print("| " + child.name)
             for row in child.rows:
                 row.dump()
 
