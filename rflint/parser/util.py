@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import time
 import re
 
@@ -28,12 +30,12 @@ class Matcher(object):
 
 
 def timeit(func):
-    def wrapper(*arg,**kw):
+    def wrapper(*arg, **kw):
         '''source: http://www.daniweb.com/code/snippet368.html'''
         t1 = time.time()
-        res = func(*arg,**kw)
+        res = func(*arg, **kw)
         t2 = time.time()
-        print func.__name__, ":", int(1000*(t2-t1)), "ms"
+        print(func.__name__, ":", int(1000*(t2-t1)), "ms")
         return res
     return wrapper
 

@@ -1,6 +1,6 @@
 # Does this need to be in its own file, or can I combine 
 # testcase and keyword into one file? 
-from common import RobotStatements
+from .common import RobotStatements
 
 class Keyword(RobotStatements):
     '''A robotframework keyword

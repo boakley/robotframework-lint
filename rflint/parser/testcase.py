@@ -1,6 +1,7 @@
-from tables import SettingTable
-from common import Row, Statement, RobotStatements
+from .tables import SettingTable
+from .common import Row, Statement, RobotStatements
 import re
+
 
 class Testcase(RobotStatements):
     def __init__(self, parent, linenumber, name):
@@ -29,7 +30,6 @@ class Testcase(RobotStatements):
             if len(statement) > 2 and statement[1].lower() == "[tags]":
                 tags = tags + statement[2:]
         return tags
-            
 
     def __repr__(self):
         # should this return the fully qualified name?

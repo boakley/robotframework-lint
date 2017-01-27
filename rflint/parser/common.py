@@ -1,3 +1,4 @@
+from __future__ import print_function
 import re
 
 class RobotStatements(object):
@@ -13,7 +14,7 @@ class RobotStatements(object):
 
     @property
     def steps(self):
-        '''Return a list of steps (statements that are not settings or comments)'''
+        """Return a list of steps (statements that are not settings or comments)"""
         steps = []
         for statement in self.statements:
             if ((not statement.is_comment()) and 
@@ -23,21 +24,21 @@ class RobotStatements(object):
 
     @property
     def settings(self):
-        '''Return a list of settings (statements with cell[1] matching \[.*?\])
+        """Return a list of settings (statements with cell[1] matching \[.*?\])
 
         Note: this returns any statement that *looks* like a setting. If you have
         a misspelled or completely bogus setting, it'll return that too
         (eg: | | [Blockumentation] | hello, world)
-        '''
+        """
         return [statement for statement in self.statements if statement.is_setting()]
 
     @property
     def statements(self):
-        '''Return a list of statements
+        """Return a list of statements
 
         This is done by joining together any rows that
         have continuations
-        '''
+        """
         # FIXME: no need to do this every time; we should cache the
         # result
         if len(self.rows) == 0:
@@ -70,14 +71,14 @@ class RobotStatements(object):
 # TODO: make Row and Statement more similar -- either
 # both should inherit from list, or neither should. 
 class Row(object):
-    '''A row is made up of a list of cells plus metadata'''
+    """A row is made up of a list of cells plus metadata"""
     def __init__(self, linenumber, raw_text, cells):
         self.linenumber = linenumber
         self.raw_text = raw_text
         self.cells = cells
 
     def dump(self):
-        print "|" + " | ".join([cell.strip() for cell in self.cells])
+        print("|" + " | ".join([cell.strip() for cell in self.cells]))
     def __len__(self):
         return len(self.cells)
     def __setitem__(self, key, value):
@@ -98,7 +99,7 @@ class Comment(Row):
     pass
 
 class Statement(list):
-    '''A Statement is a list of cells, plus some metadata'''
+    """A Statement is a list of cells, plus some metadata"""
     startline = None
     endline = None
 

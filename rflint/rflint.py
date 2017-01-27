@@ -16,6 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -30,6 +31,7 @@ from .parser import RobotFactory, SuiteFile, ResourceFile
 from .exceptions import UnknownRuleException
 
 from robot.utils.argumentparser import ArgFileParser
+
 
 class RfLint(object):
     """Robot Framework Linter"""
@@ -80,7 +82,7 @@ class RfLint(object):
         self.args = self.parse_and_process_args(args)
 
         if self.args.version:
-            print __version__
+            print(__version__)
             return 0
             
         if self.args.rulefile:
@@ -125,9 +127,9 @@ class RfLint(object):
         requested_rules = [rule.strip().lower() for rule in rule_names]
         for rule in sorted(self.all_rules, key=lambda rule: rule.name):
             if rule.name.lower() in requested_rules or len(requested_rules) == 0:
-                print rule.name
+                print(rule.name)
                 for line in rule.doc.split("\n"):
-                    print "    " + line
+                    print("    " + line)
 
     def _process_folder(self, path):
         for root, dirs, files in os.walk(path):
@@ -173,18 +175,18 @@ class RfLint(object):
     def list_rules(self):
         """Print a list of all rules"""
         for rule in sorted(self.all_rules, key=lambda rule: rule.name):
-            print rule
+            print(rule)
             if self.args.verbose:
                 for line in rule.doc.split("\n"):
-                    print "    ", line
+                    print("    ", line)
 
     def report(self, linenumber, filename, severity, message, rulename, char):
-        '''Report a rule violation'''
+        """Report a rule violation"""
 
         if self._print_filename is not None:
             # we print the filename only once. self._print_filename
             # will get reset each time a new file is processed.
-            print "+ " + self._print_filename
+            print("+ " + self._print_filename)
             self._print_filename = None
 
         if severity in (WARNING, ERROR):
@@ -192,9 +194,10 @@ class RfLint(object):
         else:
             self.counts["other"] += 1
 
-        print self.args.format.format(linenumber=linenumber, filename=filename, 
+        print(self.args.format.format(linenumber=linenumber, filename=filename,
                                       severity=severity, message=message,
-                                      rulename = rulename, char=char)
+                                      rulename=rulename, char=char))
+
     def _get_rules(self, cls):
         """Returns a list of rules of a given class
         
@@ -212,7 +215,7 @@ class RfLint(object):
         return result
 
     def _load_rule_file(self, filename):
-        '''Import the given rule file'''
+        """Import the given rule file"""
         if not (os.path.exists(filename)):
             sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
             return
@@ -290,11 +293,13 @@ class RfLint(object):
         Rule.output_format = args.format
 
         return args
-        
+
+
 class RulefileAction(argparse.Action):
     def __call__(self, parser, namespace, arg, option_string=None):
         app = getattr(namespace, "app")
         app._load_rule_file(arg)
+
 
 class ConfigureAction(argparse.Action):
     def __call__(self, parser, namespace, arg, option_string=None):
@@ -308,15 +313,17 @@ class ConfigureAction(argparse.Action):
                 return
         raise UnknownRuleException(rulename)
 
+
 class SetStatusAction(argparse.Action):
-    '''Abstract class which provides a method for checking the rule name'''
+    """Abstract class which provides a method for checking the rule name"""
     def check_rule_name(self, rulename, rules):
-        if (rulename != "all" and 
+        if (rulename != "all" and
             rulename.lower() not in [rule.name.lower() for rule in rules]):
             raise UnknownRuleException(rulename)
-        
+
+
 class SetWarningAction(SetStatusAction):
-    '''Called when the argument parser encounters --warning'''
+    """Called when the argument parser encounters --warning"""
     def __call__(self, parser, namespace, rulename, option_string = None):
 
         app = getattr(namespace, "app")
@@ -326,8 +333,9 @@ class SetWarningAction(SetStatusAction):
             if rulename == rule.name or rulename == "all":
                 rule.severity = WARNING
 
+
 class SetErrorAction(SetStatusAction):
-    '''Called when the argument parser encounters --error'''
+    """Called when the argument parser encounters --error"""
     def __call__(self, parser, namespace, rulename, option_string = None):
 
         app = getattr(namespace, "app")
@@ -339,7 +347,7 @@ class SetErrorAction(SetStatusAction):
 
 
 class SetIgnoreAction(SetStatusAction):
-    '''Called when the argument parser encounters --ignore'''
+    """Called when the argument parser encounters --ignore"""
     def __call__(self, parser, namespace, rulename, option_string = None):
 
         app = getattr(namespace, "app")
@@ -349,8 +357,9 @@ class SetIgnoreAction(SetStatusAction):
             if rulename == rule.name or rulename == "all":
                 rule.severity = IGNORE
 
+
 class ArgfileLoader(argparse.Action):
-    '''Called when the argument parser encounters --argumentfile'''
+    """Called when the argument parser encounters --argumentfile"""
     def __call__ (self, parser, namespace, values, option_string = None):
         ap = ArgFileParser(["--argumentfile","-A"])
         args = ap.process(["-A", values])

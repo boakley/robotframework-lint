@@ -3,7 +3,8 @@
 
 from setuptools import setup
 
-execfile('rflint/version.py')
+filename = 'rflint/version.py'
+exec(compile(open(filename, 'rb').read(), filename, 'exec'))
 
 setup(
     name             = 'robotframework-lint',

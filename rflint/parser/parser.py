@@ -16,6 +16,7 @@ test cases and 500 keywords in about 30ms, compared to 150ms
 for the robot parser. Sweet.  
 
 '''
+from __future__ import print_function
 
 import re
 import sys
@@ -28,6 +29,7 @@ from .tables import AbstractContainerTable, DefaultTable, SettingTable, Variable
 from .testcase import Testcase
 from .rfkeyword import Keyword
 from .common import Row, Statement
+
 
 def RobotFactory(path, parent=None):
     '''Return an instance of SuiteFile, ResourceFile, SuiteFolder
@@ -239,7 +241,7 @@ class RobotFile(object):
     def dump(self):
         '''Regurgitate the tables and rows'''
         for table in self.tables:
-            print "*** %s ***" % table.name
+            print("*** %s ***" % table.name)
             table.dump()
                 
 
@@ -320,7 +322,7 @@ if __name__ == "__main__":
         return suite
 
     if len(sys.argv) == 1:
-        print "give me a filename on the command line"
+        print("give me a filename on the command line")
         sys.exit(1)
         
     suite1 = test_robot()
