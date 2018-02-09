@@ -2,6 +2,7 @@ from rflint.common import TestRule, KeywordRule, GeneralRule, ERROR, WARNING
 
 import re
 
+
 class LineTooLong(GeneralRule):
     '''Check that a line is not too long (configurable; default=100)'''
 
@@ -45,6 +46,16 @@ class TrailingBlankLines(GeneralRule):
                 message = "Too many trailing blank lines"
                 linenumber = numlines-count
                 self.report(robot_file, message, linenumber+self.max_allowed, 0)
+
+
+class TrailingWhitespace(GeneralRule):
+    severity = WARNING
+
+    def apply(self, robot_file):
+        for linenumber, line in enumerate(robot_file.raw_text.split("\n")):
+            if len(line) != len(line.rstrip()):
+                message = "Line has trailing whitespace"
+                self.report(robot_file, message, linenumber+1)
 
 
 class FileTooLong(GeneralRule):
