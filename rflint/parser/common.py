@@ -9,7 +9,7 @@ class RobotStatements(object):
     @property
     def path(self):
         # this property exists so that the linter doesn't
-        # have to have this logic 
+        # have to have this logic
         return self.parent.path
 
     @property
@@ -17,7 +17,7 @@ class RobotStatements(object):
         """Return a list of steps (statements that are not settings or comments)"""
         steps = []
         for statement in self.statements:
-            if ((not statement.is_comment()) and 
+            if ((not statement.is_comment()) and
                 (not statement.is_setting())):
                 steps.append(statement)
         return steps
@@ -69,7 +69,7 @@ class RobotStatements(object):
 
 
 # TODO: make Row and Statement more similar -- either
-# both should inherit from list, or neither should. 
+# both should inherit from list, or neither should.
 class Row(object):
     """A row is made up of a list of cells plus metadata"""
     def __init__(self, linenumber, raw_text, cells):
@@ -92,8 +92,8 @@ class Row(object):
         return key in self.cells
 
 class Comment(Row):
-    # this isn't entirely correct or well thought out. 
-    # I need a way to capture comments rather than 
+    # this isn't entirely correct or well thought out.
+    # I need a way to capture comments rather than
     # throw them away (mainly so I can recreate the original
     # file from the parsed data)
     pass
@@ -126,4 +126,3 @@ class Statement(list):
 
     def __repr__(self):
         return "(%.4s-%.4s)%s" % (self.startline, self.endline, list.__repr__(self))
-
