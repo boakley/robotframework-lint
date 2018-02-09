@@ -195,7 +195,7 @@ class RfLint(object):
             self.counts["other"] += 1
 
         print(self.args.format.format(linenumber=linenumber, filename=filename,
-                                      severity=severity, message=message,
+                                      severity=severity, message=message.encode('utf-8'),
                                       rulename=rulename, char=char))
 
     def _get_rules(self, cls):
@@ -262,7 +262,7 @@ class RfLint(object):
         parser.add_argument("--list", "-l", action="store_true",
                             help="show a list of known rules and exit")
         parser.add_argument("--describe", "-d", action="store_true",
-                            help="describe the given ruless")
+                            help="describe the given rules")
         parser.add_argument("--no-filenames", action="store_false", dest="print_filenames", 
                             default=True,
                             help="suppress the printing of filenames")
