@@ -13,7 +13,7 @@ Performance is pretty spiffy! At the time I write this (where
 admittedly I don't fully parse everything) it is about 3x-5x faster
 than the official robot parser. It can read a file with 500
 test cases and 500 keywords in about 30ms, compared to 150ms
-for the robot parser. Sweet.  
+for the robot parser. Sweet.
 
 '''
 from __future__ import print_function
@@ -53,10 +53,10 @@ def RobotFactory(path, parent=None):
 
         rf.__class__ = ResourceFile
         return rf
-    
+
 class SuiteFolder(object):
     def __init__(self, path, parent=None):
-        
+
         self.path = os.path.abspath(path)
         self.parent = parent
         self.name = os.path.splitext(os.path.basename(path))[0]
@@ -76,7 +76,7 @@ class SuiteFolder(object):
         yielding test cases and keywords
         '''
         requested = types if len(types) > 0 else [SuiteFile, ResourceFile, SuiteFolder, Testcase, Keyword]
-            
+
         for thing in self.robot_files:
             if thing.__class__ in requested:
                 yield thing
@@ -111,9 +111,9 @@ class RobotFile(object):
 
     - A file is a set of tables
     - A table begins with a heading and extends to the next table or EOF
-    - Each table may be made up of smaller tables that define test cases 
+    - Each table may be made up of smaller tables that define test cases
       or keywords
-    - Each line of text in a table becomes a "Row". 
+    - Each line of text in a table becomes a "Row".
     - A Row object contains a list of cells.
     - A cell is all of the data between pipes, stripped of leading and
       trailing spaces
@@ -136,10 +136,10 @@ class RobotFile(object):
         Iterator which can return all test cases and/or keywords
 
         You can specify with objects to return as parameters; if
-        no parameters are given, both tests and keywords will 
+        no parameters are given, both tests and keywords will
         be returned.
 
-        For example, to get only test cases, you could call it 
+        For example, to get only test cases, you could call it
         like this:
 
             robot_file = RobotFactory(...)
@@ -147,7 +147,7 @@ class RobotFile(object):
 
         '''
         requested = types if len(types) > 0 else [Testcase, Keyword]
-            
+
         if Testcase in requested:
             for testcase in self.testcases:
                 yield testcase
@@ -162,7 +162,7 @@ class RobotFile(object):
         The general idea is to do a quick parse, creating a list of
         tables. Each table is nothing more than a list of rows, with
         each row being a list of cells. Additional parsing such as
-        combining rows into statements is done on demand. This first 
+        combining rows into statements is done on demand. This first
         pass is solely to read in the plain text and organize it by table.
         '''
 
@@ -187,7 +187,7 @@ class RobotFile(object):
                 # FIXME: I'm keeping line numbers but throwing away
                 # where each cell starts. I should be preserving that
                 # (though to be fair, robot is throwing that away so
-                # I'll have to write my own splitter if I want to save 
+                # I'll have to write my own splitter if I want to save
                 # the character position)
                 cells = TxtReader.split_row(raw_text)
                 _heading_regex = r'^\s*\*+\s*(.*?)[ *]*$'
@@ -200,18 +200,19 @@ class RobotFile(object):
                 else:
                     current_table.append(Row(linenumber, raw_text, cells))
 
+
     def __repr__(self):
         return "<RobotFile(%s)>" % self.path
 
     @property
     def type(self):
         '''Return 'suite' or 'resource' or None
-        
+
         This will return 'suite' if a testcase table is found;
         It will return 'resource' if at least one robot table
         is found. If no tables are found it will return None
         '''
-        
+
         robot_tables = [table for table in self.tables if not isinstance(table, UnknownTable)]
         if len(robot_tables) == 0:
             return None
@@ -237,13 +238,13 @@ class RobotFile(object):
             if isinstance(table, TestcaseTable):
                 for testcase in table.testcases:
                     yield testcase
-        
+
     def dump(self):
         '''Regurgitate the tables and rows'''
         for table in self.tables:
             print("*** %s ***" % table.name)
             table.dump()
-                
+
 
 def tableFactory(parent, linenumber, name, header):
     match = Matcher(re.IGNORECASE)
@@ -267,9 +268,35 @@ class SuiteFile(RobotFile):
     def __repr__(self):
         return "<SuiteFile(%s)>" % self.path
 
+    @property
+    def settings(self):
+        '''Generator which returns all of the statements in all of the settings tables'''
+        for table in self.tables:
+            if isinstance(table, SettingTable):
+                for statement in table.statements:
+                    yield statement
+
+    @property
+    def variables(self):
+        '''Generator which returns all of the statements in all of the variables tables'''
+        for table in self.tables:
+            if isinstance(table, VariableTable):
+                # FIXME: settings have statements, variables have rows WTF? :-(
+                for statement in table.rows:
+                    if statement[0] != "":
+                        yield statement
+
 class ResourceFile(RobotFile):
     def __repr__(self):
         return "<ResourceFile(%s)>" % self.path
+
+    @property
+    def settings(self):
+        '''Generator which returns all of the statements in all of the settings tables'''
+        for table in self.tables:
+            if isinstance(table, SettingTable):
+                for statement in table.statements:
+                    yield statement
 
 class TestcaseTable(AbstractContainerTable):
     _childClass = Testcase
@@ -324,6 +351,6 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         print("give me a filename on the command line")
         sys.exit(1)
-        
+
     suite1 = test_robot()
     suite2 = test_mine()
