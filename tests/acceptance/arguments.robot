@@ -93,6 +93,6 @@
 | | Run rf-lint with the following options:
 | | ... | --describe | BogusRule
 | | rflint return code should be | 1
-| | Stderr should be | 
+| | Stderr should be |
 | | ... | unknown rule: 'BogusRule'
 | | Stdout should be | ${EMPTY}

@@ -18,7 +18,7 @@
 | Test cases have the expected number of rows
 | | [Documentation]
 | | ... | Fail if the parsed testcase has the wrong number of rows
-| | 
+| |
 | | # N.B. using the template lets all keywords run even when some fail
 | | [Template] | Run keyword
 | | Verify test case 0 has 8 rows
@@ -29,12 +29,12 @@
 | Verify test case ${test_num} has ${expected} rows
 | | [Documentation]
 | | ... | Fail if the given test doesn't have the correct number of rows
-| | 
+| |
 | | ${testcase}= | Set variable | ${testcase_table.testcases[${test_num}]}
 | | ${actual}= | Get length | ${testcase.rows}
 | | Should be equal as numbers | ${actual} | ${expected}
 | | ... | Expected '${testcase.name}' to  have ${expected} rows but it had ${actual}
 | | ... | values=False
-| | 
+| |
 | | [Teardown] | Run keyword if | "${Keyword Status}" == "FAIL"
 | | ... | log list | ${testcase.rows}

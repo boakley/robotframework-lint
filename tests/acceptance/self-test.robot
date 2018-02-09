@@ -33,7 +33,7 @@
 | | ... | Run rflint against the rflint tests
 | | ... |
 | | ... | Note: it is assumed that the test name is the path of the file to test
-| | 
+| |
 | | Run rf-lint with the following options:
 | | ... | --format | {severity}: {linenumber}, {char}: {message} ({rulename})
 | | ... | --configure | TooFewTestSteps:1
@@ -41,10 +41,10 @@
 | | ... | # periods in their name...
 | | ... | --ignore | PeriodInTestName
 | | ... | ${test name}
-| | 
+| |
 | | @{messages}= | Split to lines | ${result.stdout}
 | | ${warnings}= | Get match count | ${messages} | regexp=^W:
 | | ${errors}=   | Get match count | ${messages} | regexp=^E:
-| | 
+| |
 | | Run keyword if | "${result.rc}" != "${expected_rc}" or ${warnings} != 0 or ${errors} != 0
 | | ... | Fail | unexpectected errors or warnings: \n${result.stdout}\n${result.stderr}

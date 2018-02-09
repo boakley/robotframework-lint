@@ -1,7 +1,7 @@
 *** Settings ***
 | Documentation | Tests for the rule 'FileTooLong'
 | Resource      | ../SharedKeywords.robot
-| 
+|
 | Test Teardown
 | ... | # provide some debugging information if things go bad
 | ... | Run keyword if | "${TEST STATUS}" == "FAIL"
@@ -12,7 +12,7 @@
 | | [Documentation]
 | | ... | Verify that a file of reasonable length passes the FileTooLong rule
 | |
-| | # We know this file isn't too long, so we'll use it for 
+| | # We know this file isn't too long, so we'll use it for
 | | # our test data
 | | [Setup] | Run rf-lint with the following options:
 | | ... | --no-filename
@@ -50,4 +50,3 @@
 | | ... | test_data/acceptance/rules/FileTooLong_Data.robot
 | |
 | | rflint return code should be | 0
-

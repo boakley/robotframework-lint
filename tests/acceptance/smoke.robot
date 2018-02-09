@@ -92,6 +92,7 @@
 | | ... | trailing whitespace, so we need to turn off a couple of rules
 | | [Setup] | Convert ${SUITE_SOURCE} to .tsv
 | | Run rf-lint with the following options:
+| | ... | --ignore | TrailingWhitespace
 | | ... | --ignore | LineTooLong
 | | ... | ${TEMPDIR}/smoke.tsv
 | | rflint return code should be | 0
@@ -126,7 +127,7 @@
 | | ... | | log | hello world
 | |
 | | Run rf-lint with the following options:
-| | ... | --ignore | all 
+| | ... | --ignore | all
 | | ... | --warn   | RequireSuiteDocumentation
 | | ... | --error  | RequireTestDocumentation
 | | ... | ${TEMPDIR}/busted.robot
