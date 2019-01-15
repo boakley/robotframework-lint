@@ -132,14 +132,17 @@ class RfLint(object):
                     print("    " + line)
 
     def _process_folder(self, path):
-        for root, dirs, files in os.walk(path):
-            for filename in sorted(files):
-                name, ext = os.path.splitext(filename)
-                if ext.lower() in (".robot", ".txt", ".tsv"):
-                    self._process_file(os.path.join(root, filename))
-            if self.args.recursive:
-                for dirname in sorted(dirs):
-                    self._process_folder(os.path.join(root, dirname))
+        if self.args.recursive:
+            for root, subdirs, filenames in os.walk(path):
+                self._process_files(root, filenames)
+        else:
+            self._process_files(path, os.listdir(path))
+
+    def _process_files(self, folder, filenames):
+        for filename in filenames:
+            name, ext = os.path.splitext(filename)
+            if ext.lower() in (".robot", ".txt", ".tsv"):
+                self._process_file(os.path.join(folder, filename))
  
     def _process_file(self, filename):
         # this is used by the reporting mechanism to know if it
