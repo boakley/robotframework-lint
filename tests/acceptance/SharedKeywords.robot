@@ -18,6 +18,7 @@
 | | ... | # Define a specific format for all messages (but can be overridden)
 | | ... | --format | {severity}: {linenumber}, {char}: {message} ({rulename})
 | | ... | @{options}
+| | ... | output_encoding=utf-8
 | | Set test variable | ${result}
 | | 
 | | log | stdout: ${result.stdout} | DEBUG
@@ -103,7 +104,7 @@
 | | ... | All arguments are joined together with newlines
 | | 
 | | ${expected}= | Catenate | SEPARATOR=\n | @{lines}
-| | Should be equal | ${result.stdout} | ${expected}
+| | Should be equal as strings | ${result.stdout} | ${expected}
 | | ... | Unexpected output on stdout.\nExpected:\n${expected}\nActual:\n${result.stdout}
 | | ... | values=False
 
