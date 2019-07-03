@@ -73,7 +73,7 @@
 | | ${table}= | Set variable | ${rf.tables[${table_num}]}
 | | ${actual}= | Get length | ${table.rows}
 | | Should be equal as numbers | ${actual} | ${expected}
-| | ... | Expected '${table.name}' to  have ${expected} rows but it had ${actual}
+| | ... | Expected '${table.name}' to have ${expected} rows but it had ${actual}
 | | ... | values=False
 | |
 | | [Teardown] | Run keyword if | "${Keyword Status}" == "FAIL"

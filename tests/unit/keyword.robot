@@ -34,7 +34,7 @@
 | | ${keyword}= | Set variable | ${keyword_table.keywords[${keyword_num}]}
 | | ${actual}= | Get length | ${keyword.rows}
 | | Should be equal as numbers | ${actual} | ${expected}
-| | ... | Expected '${keyword.name}' to  have ${expected} rows but it had ${actual}
+| | ... | Expected '${keyword.name}' to have ${expected} rows but it had ${actual}
 | | ... | values=False
 | |
 | | [Teardown] | Run keyword if | "${Keyword Status}" == "FAIL"

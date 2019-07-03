@@ -1,14 +1,14 @@
 *** Settings ***
 | Documentation
 | ... | Runs rflint against the rflint test suites and resource files
-| #
+|
 | Library    | OperatingSystem
 | Library    | Process
 | Resource   | SharedKeywords.robot
 | Test Template | Run rflint and verify there are no errors or warnings
 
 *** Test Cases ***
-| # file to run rflint against                           | # expected return code
+  # file to run rflint against                           | # expected return code
 | tests/unit/robotfile.robot                             | 0
 | tests/unit/testcase.robot                              | 0
 | tests/unit/keyword.robot                               | 0
@@ -31,14 +31,14 @@
 | | [Arguments] | ${expected_rc}
 | | [Documentation]
 | | ... | Run rflint against the rflint tests
-| | ... |
+| |
 | | ... | Note: it is assumed that the test name is the path of the file to test
 | |
 | | Run rf-lint with the following options:
 | | ... | --format | {severity}: {linenumber}, {char}: {message} ({rulename})
 | | ... | --configure | TooFewTestSteps:1
-| | ... | # because the test cases reference filenames, they all have
-| | ... | # periods in their name...
+| |     # because the test cases reference filenames, they all have
+| |     # periods in their name...
 | | ... | --ignore | PeriodInTestName
 | | ... | ${test name}
 | |

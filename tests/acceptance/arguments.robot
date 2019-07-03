@@ -9,7 +9,7 @@
 | Force Tags | smoke
 | #
 | Test Teardown
-| ... | # provide some debugging information if things go bad
+| # provide some debugging information if things go bad
 | ... | Run keyword if | "${TEST STATUS}" == "FAIL"
 | ... | log | ${result.stdout}\n${result.stderr}
 

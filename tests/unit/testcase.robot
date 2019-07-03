@@ -33,7 +33,7 @@
 | | ${testcase}= | Set variable | ${testcase_table.testcases[${test_num}]}
 | | ${actual}= | Get length | ${testcase.rows}
 | | Should be equal as numbers | ${actual} | ${expected}
-| | ... | Expected '${testcase.name}' to  have ${expected} rows but it had ${actual}
+| | ... | Expected '${testcase.name}' to have ${expected} rows but it had ${actual}
 | | ... | values=False
 | |
 | | [Teardown] | Run keyword if | "${Keyword Status}" == "FAIL"

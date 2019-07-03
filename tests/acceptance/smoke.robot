@@ -1,15 +1,14 @@
 *** Settings ***
 | Documentation
 | ... | This suite includes some very basic smoke tests for rflint
-| #
+|
 | Library    | OperatingSystem
 | Library    | Process
 | Library    | SharedKeywords.py
 | Resource   | SharedKeywords.robot
 | Force Tags | smoke
-| #
+|
 | Test Teardown
-| ... | # provide some debugging information if things go bad
 | ... | Run keyword if | "${TEST STATUS}" == "FAIL"
 | ... | log | ${result.stdout}\n${result.stderr}
 
@@ -123,7 +122,7 @@
 | | [Setup] | Create a test suite | ${TEMPDIR}/busted.robot
 | | ... | *** Test Cases ***\n
 | | ... | An example test case\n
-| | ... | | # no documentation\n
+| | ... | | comment | no documentation\n
 | | ... | | log | hello world
 | |
 | | Run rf-lint with the following options:
@@ -132,8 +131,8 @@
 | | ... | --error  | RequireTestDocumentation
 | | ... | ${TEMPDIR}/busted.robot
 | |
-| | # there should be two errors: no suite documentation, no testcase documentation
-| | # but the return code is only a count of the errors
+| | comment | there should be two errors: no suite documentation, no testcase documentation
+| | comment | but the return code is only a count of the errors
 | | rflint return code should be | 1
 | | rflint should report 1 errors
 | | rflint should report 1 warnings

@@ -3,7 +3,7 @@
 | Library       | OperatingSystem
 
 *** Variables ***
-| ${test_data} | tests/unit/data/pipes.robot
+| ${test_data} | testdata/pipes.robot
 | ${ROOT}      | ${CURDIR}/../..
 
 *** Keywords ***

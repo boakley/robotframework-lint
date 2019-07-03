@@ -23,7 +23,7 @@
 * Test Cases *
 | Test case #1
 | # comment in a test case
-| | [Documentation] 
+| | [Documentation]
 | | ... | This is the documentation for test case #1
 | | [Setup] | No operation
 | | [Tags] | tag1 | tag2
@@ -31,7 +31,7 @@
 | | [Teardown] | No operation
 
 | Test case #2
-| | [Documentation] 
+| | [Documentation]
 | | ... | This is the documentation for test case #2
 | | [Tags] | tag1 | tag2
 | | No operation
@@ -51,7 +51,7 @@ this table should parse even though the table
 | | ... | This is the documentation for keyword #1
 # whole-line comment in a keyword, followed by a blank line
 
-| | No operation 
+| | No operation
 
 | Keyword #2
 | | [Documentation]
