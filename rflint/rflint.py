@@ -197,8 +197,15 @@ class RfLint(object):
         else:
             self.counts["other"] += 1
 
+        if sys.version_info[0] == 2:
+            # I _really_ hate doing this, but I can't figure out a
+            # better way to handle unicode such that it works both
+            # in python 2 and 3. There must be a better way, but
+            # my unicode fu is weak. 
+            message = message.encode('utf-8')
+
         print(self.args.format.format(linenumber=linenumber, filename=filename,
-                                      severity=severity, message=message.encode('utf-8'),
+                                      severity=severity, message=message,
                                       rulename=rulename, char=char))
 
     def _get_rules(self, cls):
