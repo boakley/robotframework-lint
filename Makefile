@@ -7,9 +7,7 @@ test: test-py2 test-py3
 	python3 -m robot.rebot \
 	  --outputdir  tests/results \
 	  tests/results/py2/output.xml \
-	  tests/results/py2/demo/output.xml \
 	  tests/results/py3/output.xml \
-	  tests/results/py3/demo/output.xml
 
 test-py3:
 	python3 -m robot \
@@ -49,5 +47,3 @@ release: clean dist
 dist: clean
 	python setup.py sdist
 	ls -l dist
-
-
