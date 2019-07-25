@@ -32,6 +32,9 @@ from .exceptions import UnknownRuleException
 
 from robot.utils.argumentparser import ArgFileParser
 
+# Used to track which files have already been imported
+IMPORTED_RULE_FILES = []
+
 
 class RfLint(object):
     """Robot Framework Linter"""
@@ -55,7 +58,7 @@ class RfLint(object):
     def suite_rules(self):
         return self._get_rules(SuiteRule)
 
-    @property 
+    @property
     def resource_rules(self):
         return self._get_rules(ResourceRule)
 
@@ -84,7 +87,7 @@ class RfLint(object):
         if self.args.version:
             print(__version__)
             return 0
-            
+
         if self.args.rulefile:
             for filename in self.args.rulefile:
                 self._load_rule_file(filename)
@@ -92,13 +95,13 @@ class RfLint(object):
         if self.args.list:
             self.list_rules()
             return 0
-        
+
         if self.args.describe:
             self._describe_rules(self.args.args)
             return 0
 
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
-            
+
         for filename in self.args.args:
             if not (os.path.exists(filename)):
                 sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
@@ -141,13 +144,13 @@ class RfLint(object):
     def _process_files(self, folder, filenames):
         for filename in filenames:
             name, ext = os.path.splitext(filename)
-            if ext.lower() in (".robot", ".txt", ".tsv"):
+            if ext.lower() in (".robot", ".txt", ".tsv", ".resource"):
                 self._process_file(os.path.join(folder, filename))
- 
+
     def _process_file(self, filename):
         # this is used by the reporting mechanism to know if it
         # should print the filename. Once it has been printed it
-        # will be reset so that it won't get printed again until 
+        # will be reset so that it won't get printed again until
         # we process the next file.
         self._print_filename = filename if self.args.print_filenames else None
 
@@ -201,7 +204,7 @@ class RfLint(object):
             # I _really_ hate doing this, but I can't figure out a
             # better way to handle unicode such that it works both
             # in python 2 and 3. There must be a better way, but
-            # my unicode fu is weak. 
+            # my unicode fu is weak.
             message = message.encode('utf-8')
 
         print(self.args.format.format(linenumber=linenumber, filename=filename,
@@ -210,9 +213,9 @@ class RfLint(object):
 
     def _get_rules(self, cls):
         """Returns a list of rules of a given class
-        
+
         Rules are treated as singletons - we only instantiate each
-        rule once. 
+        rule once.
         """
 
         result = []
@@ -226,6 +229,9 @@ class RfLint(object):
 
     def _load_rule_file(self, filename):
         """Import the given rule file"""
+        abspath = os.path.abspath(filename)
+        if abspath in IMPORTED_RULE_FILES:
+            return
         if not (os.path.exists(filename)):
             sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
             return
@@ -233,6 +239,7 @@ class RfLint(object):
             basename = os.path.basename(filename)
             (name, ext) = os.path.splitext(basename)
             imp.load_source(name, filename)
+            IMPORTED_RULE_FILES.append(abspath)
         except Exception as e:
             sys.stderr.write("rflint: %s: exception while loading: %s\n" % (filename, str(e)))
 
@@ -241,7 +248,7 @@ class RfLint(object):
 
         parser = argparse.ArgumentParser(
             prog="python -m rflint",
-            description="A style checker for robot framework plain text files.",
+            description="A static analyzer for robot framework plain text files.",
             formatter_class=argparse.RawDescriptionHelpFormatter,
             epilog = (
                 "You can use 'all' in place of RULENAME to refer to all rules. \n"
@@ -258,9 +265,9 @@ class RfLint(object):
                 "standard robot framework argument files\n"
                 "\n"
                 "If you give a directory as an argument, all files in the directory\n"
-                "with the suffix .txt, .robot or .tsv will be processed. With the \n"
-                "--recursive option, subfolders within the directory will also be\n"
-                "processed."
+                "with the suffix .txt, .robot, .resource, or .tsv will be processed. \n"
+                "With the --recursive option, subfolders within the directory will \n"
+                "also be processed."
                 )
             )
         parser.add_argument("--error", "-e", metavar="RULENAME", action=SetErrorAction,
@@ -273,10 +280,10 @@ class RfLint(object):
                             help="show a list of known rules and exit")
         parser.add_argument("--describe", "-d", action="store_true",
                             help="describe the given rules")
-        parser.add_argument("--no-filenames", action="store_false", dest="print_filenames", 
+        parser.add_argument("--no-filenames", action="store_false", dest="print_filenames",
                             default=True,
                             help="suppress the printing of filenames")
-        parser.add_argument("--format", "-f", 
+        parser.add_argument("--format", "-f",
                             help="Define the output format",
                             default='{severity}: {linenumber}, {char}: {message} ({rulename})')
         parser.add_argument("--version", action="store_true", default=False,
