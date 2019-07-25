@@ -30,7 +30,8 @@ class RobotStatements(object):
         a misspelled or completely bogus setting, it'll return that too
         (eg: | | [Blockumentation] | hello, world)
         """
-        return [statement for statement in self.statements if statement.is_setting()]
+        return [statement for statement in self.statements
+                if (statement.is_setting() and not statement.is_comment())]
 
     @property
     def statements(self):
