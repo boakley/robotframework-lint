@@ -1,9 +1,9 @@
 Welcome to Robot Framework Lint
 ===============================
 
-Static analysis for robot framework plain text files. 
+Static analysis for robot framework plain text files.
 
-This is a static analysis tool for robot framework plain text files. 
+This is a static analysis tool for robot framework plain text files.
 
 Installation Instructions
 -------------------------
@@ -25,7 +25,7 @@ Custom rules
 ------------
 
 Rules are simple python classes. For more information about how to
-write rules, see the 
+write rules, see the
 [robotframework-lint wiki](https://github.com/boakley/robotframework-lint/wiki)
 
 Argument files
@@ -58,7 +58,7 @@ can change the default value with the configure option:
     $ rflint --configure LineTooLong:80 myTestSuite.robot
 
 You can disable any rule, or configure it to be a warning or error
-with the options --warning, --error and --ignore. For example, to 
+with the options --warning, --error and --ignore. For example, to
 ignore the LineTooLong rule you can do this:
 
     $ rflint --ignore LineTooLong myTestSuite.robot
@@ -74,7 +74,7 @@ Example output:
     W: 2, 0: No suite documentation (RequireSuiteDocumentation)
     E: 15, 0: No keyword documentation (RequireKeywordDocumentation)
 
-This show a warning on line two, character 0, where there should be suite 
+This show a warning on line two, character 0, where there should be suite
 documentation but isn't. It also shows an error on line 15, character 0,
 where there should be keyword documentation but there isn't.
 

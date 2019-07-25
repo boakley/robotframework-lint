@@ -21,7 +21,7 @@ class LineTooLong(GeneralRule):
 class TrailingBlankLines(GeneralRule):
     '''Check for multiple blank lines at the end of a file
 
-    This is a configurable. The default value is 2. 
+    This is a configurable. The default value is 2.
     '''
 
     severity = WARNING

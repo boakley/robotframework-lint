@@ -47,4 +47,3 @@ class TooFewKeywordSteps(KeywordRule):
         if len(steps) < self.min_required:
             msg = "Too few steps (%s) in keyword" % len(steps)
             self.report(keyword, msg, keyword.linenumber)
-

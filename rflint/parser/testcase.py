@@ -11,7 +11,7 @@ class Testcase(RobotStatements):
         self.rows = []
         self.parent = parent
 
-    @property 
+    @property
     def is_templated(self):
         """Return True if the test is part of a suite that uses a Test Template"""
         for table in self.parent.tables:
@@ -23,7 +23,7 @@ class Testcase(RobotStatements):
 
     # this is great, except that we don't return the line number
     # or character position of each tag. The linter needs that. :-(
-    @property 
+    @property
     def tags(self):
         tags = []
         for statement in self.statements:
@@ -34,4 +34,3 @@ class Testcase(RobotStatements):
     def __repr__(self):
         # should this return the fully qualified name?
         return "<Testcase: %s>" % self.name
-
