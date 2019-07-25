@@ -20,7 +20,7 @@ setup(
     include_package_data = True,
     install_requires = ['robotframework'],
     classifiers      = [
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Framework :: Robot Framework",
@@ -35,7 +35,7 @@ setup(
         'rflint.rules',
         'rflint.parser',
         ],
-    scripts          =[], 
+    scripts          =[],
     entry_points={
         'console_scripts': [
             "rflint = rflint.__main__:main"

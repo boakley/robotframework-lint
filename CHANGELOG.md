@@ -1,11 +1,26 @@
 # Change Log
+## 1.0 - 2019-07-24
+
+### Issues closed
+- Issue #37 - trailing whitespace on line
+- Issue #54 - Fix the recursive option
+              Thanks to Bassam Khouri for the fix
+- Issue #62 - Comments included in keyword settings
+- Issue #63 - Multiple instances of RfLint will result in duplicate rules
+
+### New Rules
+- TrailingWhitespace
+
+### Other Changes
+- fixed some unicode issues
+- tested with python 3.7.2
 
 ## 0.7.0 - 2016-03-07
 - fix for issue #30 - preserve table headings
 
 ## 0.6.1 - 2015-07-22
 
-- added `walk` method to RobotFile class, that somehow got 
+- added `walk` method to RobotFile class, that somehow got
   left out in the 0.6 version.
 
 ## 0.6 - 2015-07-21
@@ -21,7 +36,7 @@
 - Issue #28 - --rulefile isn't working
 - Issue #30 - When ResourceRule class has configure method, rflint says the rule is unknown.
 - Issue #31 - A GeneralRule class rule is not passed an object with a type attribute
-	
+
 ### Other changes
 - small improvements to the custom parser
 
@@ -69,12 +84,12 @@
 - issue #13 - non-breaking spaces in a test file
 - issue #15 - only list files that have errors/warnings
 - issue #20 - Add --rulefile option for loading rules by filename
-- issue #21 - "file not found" should be printed for bad filenames 	
+- issue #21 - "file not found" should be printed for bad filenames
 
 ### Other changes
 - internally, a parsed file is now either an instance of rflint.SuiteFile
   or rflint.ResourceFile, depending on whether the file has a testcase
-  table in it. Prior to this change, the object was always of class RobotFile. 
+  table in it. Prior to this change, the object was always of class RobotFile.
   Both of these classes are a subclass of rflint.RobotFile, so any old
   code that depends on that should continue to work.
 
@@ -88,6 +103,5 @@
 - added some acceptance tests
 
 ### Fixed
-- RequireTestDocumentation no longer will generate a message if the 
+- RequireTestDocumentation no longer will generate a message if the
   suite is templated, since documentation in templated tests is cumbersome
-
