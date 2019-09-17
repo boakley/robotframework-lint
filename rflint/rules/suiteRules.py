@@ -8,12 +8,12 @@ def normalize_name(string):
 
 class PeriodInSuiteName(SuiteRule):
     '''Warn about periods in the suite name
-    
+
     Since robot uses "." as a path separator, using a "." in a suite
-    name can lead to ambiguity. 
+    name can lead to ambiguity.
     '''
     severity = WARNING
-    
+
     def apply(self,suite):
         if "." in suite.name:
             self.report(suite, "'.' in suite name '%s'" % suite.name, 0)
@@ -24,7 +24,7 @@ class InvalidTable(SuiteRule):
 
     def apply(self, suite):
         for table in suite.tables:
-            if (not re.match(r'^(settings?|metadata|(test )?cases?|(user )?keywords?|variables?)$', 
+            if (not re.match(r'^(settings?|metadata|(test )?cases?|(user )?keywords?|variables?)$',
                              table.name, re.IGNORECASE)):
                 self.report(suite, "Unknown table name '%s'" % table.name, table.linenumber)
 
@@ -78,16 +78,16 @@ class RequireSuiteDocumentation(SuiteRule):
                 break
 
         self.report(suite, "No suite documentation", linenum)
-            
+
 class TooManyTestCases(SuiteRule):
     '''
-    Should not have too many tests in one suite. 
+    Should not have too many tests in one suite.
 
     The exception is if they are data-driven.
 
     https://code.google.com/p/robotframework/wiki/HowToWriteGoodTestCases#Test_suite_structure
 
-    You can configure the maximum number of tests. The default is 10. 
+    You can configure the maximum number of tests. The default is 10.
     '''
     severity = WARNING
     max_allowed = 10
@@ -108,4 +108,36 @@ class TooManyTestCases(SuiteRule):
             self.report(
                 suite, "Too many test cases (%s > %s) in test suite"
                 % (len(testcases), self.max_allowed), testcases[self.max_allowed].linenumber
+            )
+
+
+class TooFewTestCases(SuiteRule):
+    '''
+    Single suite should have more than 2 test cases
+
+    The exception is if they are data-driven.
+
+    https://code.google.com/p/robotframework/wiki/HowToWriteGoodTestCases#Test_suite_structure
+
+    You can configure the minimum number of tests. The default is 2
+    '''
+    severity = WARNING
+    min_required = 2
+
+    def configure(self, min_required):
+        self.min_required = int(min_required)
+
+    def apply(self, suite):
+        # check for template (data-driven tests)
+        for table in suite.tables:
+            if isinstance(table, SettingTable):
+                for row in table.rows:
+                    if row[0].lower() == "test template":
+                        return
+        # we didn't find a template, so these aren't data-driven
+        testcases = list(suite.testcases)
+        if len(testcases) < self.min_required:
+            self.report(
+                suite, "Too few test cases (%s < %s) in test suite"
+                % (len(testcases), self.min_required), testcases[len(testcases)-1].linenumber
             )

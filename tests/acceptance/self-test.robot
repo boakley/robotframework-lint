@@ -40,6 +40,7 @@
 | |     # because the test cases reference filenames, they all have
 | |     # periods in their name...
 | | ... | --ignore | PeriodInTestName
+| | ... | --ignore | TooFewTestCases
 | | ... | ${test name}
 | |
 | | @{messages}= | Split to lines | ${result.stdout}
