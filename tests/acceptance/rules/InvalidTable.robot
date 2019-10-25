@@ -19,8 +19,8 @@
 | | ... | --error  | InvalidTable
 | | ... | test_data/acceptance/rules/InvalidTable_Data.robot
 | |
-| | rflint return code should be | 7
-| | rflint should report 7 errors
+| | rflint return code should be | 6
+| | rflint should report 6 errors
 | | rflint should report 0 warnings
 
 | Verify that the proper error message is returned
@@ -40,5 +40,4 @@
 | | ... | E: 8, 0: Unknown table name '' (InvalidTable)
 | | ... | E: 9, 0: Unknown table name 'Testcase' (InvalidTable)
 | | ... | E: 10, 0: Unknown table name 'Key word' (InvalidTable)
-| | ... | E: 34, 0: Unknown table name 'bogus' (InvalidTable)
-| | ... | E: 35, 0: Unknown table name 'Comments' (InvalidTable)
+| | ... | E: 36, 0: Unknown table name 'bogus' (InvalidTable)

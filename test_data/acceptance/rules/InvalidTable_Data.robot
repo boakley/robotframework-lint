@@ -19,6 +19,8 @@
   *** Setting ***
 *** Setting ***
 *** Settings ***
+*** Comment ***
+*** Comments ***
 *** Metadata ***
 *** Test Case ***
 *** Test Cases ***
@@ -32,6 +34,5 @@
 # these should fail the rule
 
 *** bogus ***
-*** Comments ***
 
 
