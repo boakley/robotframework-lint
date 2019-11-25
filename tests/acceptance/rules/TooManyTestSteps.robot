@@ -15,7 +15,7 @@
 | | ... | --no-filename
 | | ... | --ignore | all
 | | ... | --error  | TooManyTestSteps
-| | ... | ${SUITE SOURCE} | use this file as input
+| | ... | ${SUITE SOURCE}
 | |
 | | No operation
 | | No operation

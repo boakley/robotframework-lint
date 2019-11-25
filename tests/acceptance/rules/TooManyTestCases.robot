@@ -48,7 +48,7 @@
 | | ... | --no-filename
 | | ... | --ignore | all
 | | ... | --error  | TooManyTestCases
-| | ... | ${SUITE SOURCE} | use this file as input
+| | ... | ${SUITE SOURCE}
 | |
 | | rflint return code should be | 0
 | | rflint should report 0 errors

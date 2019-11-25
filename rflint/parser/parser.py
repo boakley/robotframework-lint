@@ -126,10 +126,7 @@ class RobotFile(object):
         self.tables = []
         self.rows = []
 
-        try:
-            self._load(path)
-        except Exception as e:
-            sys.stderr.write("there was a problem reading '%s': %s\n" % (path, str(e)))
+        self._load(path)
 
     def walk(self, *types):
         '''
