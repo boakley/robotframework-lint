@@ -5,6 +5,11 @@ WARNING = "W"
 IGNORE = "I"
 
 
+def normalize_name(string):
+    '''convert to lowercase, remove spaces and underscores'''
+    return string.replace(" ", "").replace("_", "").lower()
+
+
 class Rule(object): 
     # default severity; subclasses may override
     severity = WARNING

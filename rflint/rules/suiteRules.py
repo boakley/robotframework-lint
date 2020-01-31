@@ -1,19 +1,15 @@
-from rflint.common import SuiteRule, ERROR, WARNING
+from rflint.common import SuiteRule, ERROR, WARNING, normalize_name
 from rflint.parser import SettingTable
 import re
 
-def normalize_name(string):
-    '''convert to lowercase, remove spaces and underscores'''
-    return string.replace(" ", "").replace("_", "").lower()
-
 class PeriodInSuiteName(SuiteRule):
     '''Warn about periods in the suite name
-    
+
     Since robot uses "." as a path separator, using a "." in a suite
-    name can lead to ambiguity. 
+    name can lead to ambiguity.
     '''
     severity = WARNING
-    
+
     def apply(self,suite):
         if "." in suite.name:
             self.report(suite, "'.' in suite name '%s'" % suite.name, 0)
@@ -78,16 +74,16 @@ class RequireSuiteDocumentation(SuiteRule):
                 break
 
         self.report(suite, "No suite documentation", linenum)
-            
+
 class TooManyTestCases(SuiteRule):
     '''
-    Should not have too many tests in one suite. 
+    Should not have too many tests in one suite.
 
     The exception is if they are data-driven.
 
     https://code.google.com/p/robotframework/wiki/HowToWriteGoodTestCases#Test_suite_structure
 
-    You can configure the maximum number of tests. The default is 10. 
+    You can configure the maximum number of tests. The default is 10.
     '''
     severity = WARNING
     max_allowed = 10
