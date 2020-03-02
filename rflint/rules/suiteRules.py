@@ -15,14 +15,27 @@ class PeriodInSuiteName(SuiteRule):
             self.report(suite, "'.' in suite name '%s'" % suite.name, 0)
 
 class InvalidTable(SuiteRule):
-    '''Verify that there are no invalid table headers'''
-    severity = WARNING
+    '''Verify that there are no invalid table headers
+
+    Parameter robot_level to be set to 'robot3' (default) or 'robot2'.'''
+    valid_tables_re = None
+    default_robot_level = "robot3"
+
+    def configure(self, robot_level):
+        valid_tables = ['comments?', 'settings?', 'tasks?', 'test cases?',
+                        'keywords?', 'variables?']
+        if robot_level == "robot2":
+            valid_tables += ['cases?', 'metadata', 'user keywords?']
+        self.valid_tables_re = re.compile('^(' + '|'.join(valid_tables) + ')$',
+                                          re.I)
 
     def apply(self, suite):
+        if not self.valid_tables_re:
+            self.configure(self.default_robot_level)
         for table in suite.tables:
-            if (not re.match(r'^(comments?|settings?|metadata|(test )?cases?|(user )?keywords?|variables?)$', 
-                             table.name, re.IGNORECASE)):
-                self.report(suite, "Unknown table name '%s'" % table.name, table.linenumber)
+            if not self.valid_tables_re.match(table.name):
+                self.report(suite, "Unknown table name '%s'" % table.name,
+                            table.linenumber)
 
 
 class DuplicateKeywordNames(SuiteRule):

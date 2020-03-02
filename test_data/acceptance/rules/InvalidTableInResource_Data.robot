@@ -1,12 +1,11 @@
 ## Test data for the rule InvalidTable
 ##
 
-# these should fail the rule 
+# these should fail the rule
 
 *
 * *
 *** 
-*** Testcase ***
 * Key word
 
 # these should be valid:
@@ -22,9 +21,6 @@
 *** Comment ***
 *** Comments ***
 *** Metadata ***
-*** Cases ***
-*** Test Case ***
-*** Test Cases ***
 *** Variable ***
 *** Variables ***
 *** Keyword ***

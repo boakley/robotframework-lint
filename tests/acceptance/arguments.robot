@@ -80,12 +80,12 @@
 | | [Documentation]
 | | ... | Verify that --describe works
 | | Run rf-lint with the following options:
-| | ... | --describe | InvalidTable
+| | ... | --describe | RequireKeywordDocumentation
 | | rflint return code should be | 0
 | | Stderr should be | ${EMPTY}
 | | Stdout should be
-| | ... | InvalidTable
-| | ... | ${SPACE*4}Verify that there are no invalid table headers
+| | ... | RequireKeywordDocumentation
+| | ... | ${SPACE*4}Verify that a keyword has documentation
 
 | The --describe option with invalid rule name
 | | [Documentation]
