@@ -52,7 +52,7 @@ class TrailingWhitespace(GeneralRule):
     severity = WARNING
 
     def apply(self, robot_file):
-        for linenumber, line in enumerate(robot_file.raw_text.split("\n")):
+        for linenumber, line in enumerate(robot_file.raw_text.splitlines()):
             if len(line) != len(line.rstrip()):
                 message = "Line has trailing whitespace"
                 self.report(robot_file, message, linenumber+1)
