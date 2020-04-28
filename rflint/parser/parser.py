@@ -22,7 +22,7 @@ import re
 import sys
 import os.path
 from robot.errors import DataError
-from robot.utils import Utf8Reader
+from robot.utils import FileReader
 from .util import timeit, Matcher
 from .tables import AbstractContainerTable, DefaultTable, SettingTable, VariableTable, UnknownTable
 from .testcase import Testcase
@@ -168,11 +168,10 @@ class RobotFile(object):
         self.tables = []
         current_table = DefaultTable(self)
 
-        with Utf8Reader(path) as f:
+        with FileReader(path) as f:
             # N.B. the caller should be catching errors
             self.raw_text = f.read()
 
-            f._file.seek(0) # bleh; wish this wasn't a private property
             matcher = Matcher(re.IGNORECASE)
             for linenumber, raw_text in enumerate(f.readlines()):
                 linenumber += 1; # start counting at 1 rather than zero
