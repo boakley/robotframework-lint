@@ -4,8 +4,8 @@ A custom robotframework parser that retains line numbers (though
 it doesn't (yet!) retain character positions for each cell)
 
 
-Note: this only works on pipe and space separated files. It uses part
-of the TxtReader robot parser to divide a line into cells.
+Note: this only works on pipe and space separated files. It uses a
+copy of the deprecated TxtReader robot parser to divide a line into cells.
 
 (probably works for space-separated too. I haven't tried. )
 
@@ -21,9 +21,8 @@ from __future__ import print_function
 import re
 import sys
 import os.path
-from robot.parsing.txtreader import TxtReader
 from robot.errors import DataError
-from robot.utils import Utf8Reader
+from robot.utils import FileReader
 from .util import timeit, Matcher
 from .tables import AbstractContainerTable, DefaultTable, SettingTable, VariableTable, UnknownTable
 from .testcase import Testcase
@@ -169,11 +168,10 @@ class RobotFile(object):
         self.tables = []
         current_table = DefaultTable(self)
 
-        with Utf8Reader(path) as f:
+        with FileReader(path) as f:
             # N.B. the caller should be catching errors
             self.raw_text = f.read()
 
-            f._file.seek(0) # bleh; wish this wasn't a private property
             matcher = Matcher(re.IGNORECASE)
             for linenumber, raw_text in enumerate(f.readlines()):
                 linenumber += 1; # start counting at 1 rather than zero
@@ -189,7 +187,7 @@ class RobotFile(object):
                 # (though to be fair, robot is throwing that away so
                 # I'll have to write my own splitter if I want to save
                 # the character position)
-                cells = TxtReader.split_row(raw_text)
+                cells = split_row(raw_text)
                 _heading_regex = r'^\s*\*+\s*(.*?)[ *]*$'
 
                 if matcher(_heading_regex, cells[0]):
@@ -200,6 +198,19 @@ class RobotFile(object):
                 else:
                     current_table.append(Row(linenumber, raw_text, cells))
 
+    def split_row(self, row):
+        """ function copied from
+        https://github.com/robotframework/robotframework/blob/v3.1.2/src/robot/parsing/robotreader.py
+        """
+        space_splitter = re.compile(u'[ \t\xa0]{2,}|\t+')
+        pipe_splitter = re.compile(u'[ \t\xa0]+\|(?=[ \t\xa0]+)')
+        pipe_starts = ('|', '| ', '|\t', u'|\xa0')
+        pipe_ends = (' |', '\t|', u'\xa0|')
+        if row[:2] in pipe_starts:
+            row = row[1:-1] if row[-2:] in pipe_ends else row[1:]
+            return [cell.strip()
+                    for cell in pipe_splitter.split(row)]
+        return space_splitter.split(row)
 
     def __repr__(self):
         return "<RobotFile(%s)>" % self.path
