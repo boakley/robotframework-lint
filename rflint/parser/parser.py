@@ -171,6 +171,7 @@ class RobotFile(object):
         with FileReader(path) as f:
             # N.B. the caller should be catching errors
             self.raw_text = f.read()
+            f.file.seek(0)
 
             matcher = Matcher(re.IGNORECASE)
             for linenumber, raw_text in enumerate(f.readlines()):
@@ -187,7 +188,7 @@ class RobotFile(object):
                 # (though to be fair, robot is throwing that away so
                 # I'll have to write my own splitter if I want to save
                 # the character position)
-                cells = split_row(raw_text)
+                cells = self.split_row(raw_text)
                 _heading_regex = r'^\s*\*+\s*(.*?)[ *]*$'
 
                 if matcher(_heading_regex, cells[0]):
