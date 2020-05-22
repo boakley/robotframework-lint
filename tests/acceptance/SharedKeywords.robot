@@ -76,9 +76,10 @@
 | |
 | | @{lines}= | Split to lines | ${result.stdout}
 | | log | ${lines}
-| | :FOR | ${pattern} | IN | @{patterns}
+| | FOR | ${pattern} | IN | @{patterns}
 | | | Should contain match | ${lines} | ${pattern}
 | | | ... | expected:\n${pattern}\nbut got:\n${lines}
+| | END
 
 | Output should not contain
 | | [Arguments] | @{patterns}
@@ -92,10 +93,11 @@
 | | ... | you can only search for relatively short strings.
 | |
 | | ${lines}= | Split to lines | ${result.stdout}
-| | :FOR | ${pattern} | IN | @{patterns}
+| | FOR | ${pattern} | IN | @{patterns}
 | | | Should not contain match | ${lines} | ${pattern}
 | | | ... | stdout should not contain '${pattern}' but it did:\n${result.stdout}
 | | | ... | values=False
+| | END
 
 | Stdout should be
 | | [Arguments] | @{lines}
