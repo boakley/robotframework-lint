@@ -131,7 +131,7 @@ class RfLint(object):
         for rule in sorted(self.all_rules, key=lambda rule: rule.name):
             if rule.name.lower() in requested_rules or len(requested_rules) == 0:
                 print(rule.name)
-                for line in rule.doc.split("\n"):
+                for line in rule.doc.splitlines():
                     print("    " + line)
 
     def _process_folder(self, path):
@@ -183,7 +183,7 @@ class RfLint(object):
         for rule in sorted(self.all_rules, key=lambda rule: rule.name):
             print(rule)
             if self.args.verbose:
-                for line in rule.doc.split("\n"):
+                for line in rule.doc.splitlines():
                     print("    ", line)
 
     def report(self, linenumber, filename, severity, message, rulename, char):

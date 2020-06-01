@@ -34,7 +34,7 @@
 | |
 | | rflint return code should be | 1
 | | Output should contain
-| | ... | E: 301, 0: File has too many lines (302) (FileTooLong)
+| | ... | E: 301, 0: File has too many lines (301) (FileTooLong)
 
 | Verify we can reconfigure the limit
 | | [Documentation]

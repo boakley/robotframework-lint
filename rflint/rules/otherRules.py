@@ -13,7 +13,7 @@ class LineTooLong(GeneralRule):
         self.maxchars = int(maxchars)
 
     def apply(self, robot_file):
-        for linenumber, line in enumerate(robot_file.raw_text.split("\n")):
+        for linenumber, line in enumerate(robot_file.raw_text.splitlines()):
             if len(line) > self.maxchars:
                 message = "Line is too long (exceeds %s characters)" % self.maxchars
                 self.report(robot_file, message, linenumber+1, self.maxchars)
@@ -42,7 +42,7 @@ class TrailingBlankLines(GeneralRule):
         if match:
             count = len(re.findall(r'\n', match.group(0)))
             if count > self.max_allowed:
-                numlines = len(robot_file.raw_text.split("\n"))
+                numlines = len(robot_file.raw_text.splitlines())
                 message = "Too many trailing blank lines"
                 linenumber = numlines-count
                 self.report(robot_file, message, linenumber+self.max_allowed, 0)
@@ -71,7 +71,7 @@ class FileTooLong(GeneralRule):
         self.max_allowed = int(max_allowed)
 
     def apply(self, robot_file):
-        lines = robot_file.raw_text.split("\n")
+        lines = robot_file.raw_text.splitlines()
         if len(lines) > self.max_allowed:
             message = "File has too many lines (%s)" % len(lines)
             linenumber = self.max_allowed+1
