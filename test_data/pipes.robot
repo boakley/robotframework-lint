@@ -26,7 +26,7 @@
 | | [Documentation]
 | | ... | This is the documentation for test case #1
 | | [Setup] | No operation
-| | [Tags] | tag1 | tag2
+| | [Tags] | tag1 | tag2 | # comment; not a tag
 | | No operation | # comment in a statement
 | | [Teardown] | No operation
 

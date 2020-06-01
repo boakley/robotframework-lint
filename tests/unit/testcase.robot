@@ -25,6 +25,14 @@
 | | Verify test case 1 has 5 rows
 | | Verify test case 2 has 5 rows
 
+| Testcase.tags ignores comments
+| | [Documentation]  | Verify that comments aren't included in the list of tags for a test
+| | [tags] | issue-61
+| | ${testcase}= | Set variable | ${testcase_table.testcases[0]}
+| | log to console  | \ntags:  ${testcase.tags}
+| | ${expected}=  | Create List  | tag1  | tag2
+| | Should be equal | ${testcase.tags} | ${expected}
+
 *** Keywords ***
 | Verify test case ${test_num} has ${expected} rows
 | | [Documentation]

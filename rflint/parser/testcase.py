@@ -28,7 +28,13 @@ class Testcase(RobotStatements):
         tags = []
         for statement in self.statements:
             if len(statement) > 2 and statement[1].lower() == "[tags]":
-                tags = tags + statement[2:]
+                for tag in statement[2:]:
+                    if tag.startswith("#"):
+                        # the start of a comment, so skip rest of the line
+                        break
+                    else:
+                        tags.append(tag)
+                break
         return tags
 
     def __repr__(self):
