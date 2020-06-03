@@ -24,7 +24,6 @@
 | tests/acceptance/rules/TooManyTestSteps.robot          | 0
 | tests/acceptance/rules/LineTooLong.robot               | 0
 | tests/acceptance/rules/FileTooLong.robot               | 0
-| tests/acceptance/rules/TrailingBlankLines.robot        | 0
 
 *** Keywords ***
 | Run rflint and verify there are no errors or warnings

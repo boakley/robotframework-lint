@@ -103,9 +103,6 @@ class RfLint(object):
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
 
         for filename in self.args.args:
-            if not (os.path.exists(filename)):
-                sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
-                continue
             if os.path.isdir(filename):
                 self._process_folder(filename)
             else:
@@ -154,7 +151,12 @@ class RfLint(object):
         # we process the next file.
         self._print_filename = filename if self.args.print_filenames else None
 
-        robot_file = RobotFactory(filename)
+        try:
+            robot_file = RobotFactory(filename)
+        except Exception as e:
+            self.report(filename=filename, rulename="RfLint",
+                        message=str(e), severity=ERROR, linenumber=0, char=0)
+
         for rule in self.general_rules:
             if rule.severity != IGNORE:
                 rule.apply(robot_file)
