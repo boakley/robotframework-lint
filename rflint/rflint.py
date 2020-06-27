@@ -100,7 +100,7 @@ class RfLint(object):
             self._describe_rules(self.args.args)
             return 0
 
-        self.counts = { ERROR: 0, WARNING: 0, "other": 0}
+        self.counts = {ERROR: 0, WARNING: 0, "other": 0}
 
         for filename in self.args.args:
             if not (os.path.exists(filename)):
@@ -110,6 +110,12 @@ class RfLint(object):
                 self._process_folder(filename)
             else:
                 self._process_file(filename)
+
+        if self.args.summary:
+            print("----------------------------------------------------------------------",
+                  f"Found {sum([x for x in self.counts.values()])} issues: "
+                  f"{self.counts['E']} ERROR(s), {self.counts['W']} WARNING(s), {self.counts['other']} other(s).",
+                  sep="\n")
 
         if self.counts[ERROR] > 0:
             return self.counts[ERROR] if self.counts[ERROR] < 254 else 255
@@ -290,6 +296,8 @@ class RfLint(object):
                             help="Display version number and exit")
         parser.add_argument("--verbose", "-v", action="store_true", default=False,
                             help="Give verbose output")
+        parser.add_argument("--summary", "-s", action="store_true", default=False,
+                            help="Show summary for found issues at the end")
         parser.add_argument("--configure", "-c", action=ConfigureAction,
                             help="Configure a rule")
         parser.add_argument("--recursive", "-r", action="store_true", default=False,
