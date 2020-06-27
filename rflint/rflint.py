@@ -257,7 +257,7 @@ class RfLint(object):
                 "rules except DuplicateTestNames.\n"
                 "\n"
                 "FORMAT is a string that performs a substitution on the following \n"
-                "patterns: {severity}, {linenumber}, {char}, {message}, and {rulename}.\n"
+                "patterns: {filename}, {severity}, {linenumber}, {char}, {message} and {rulename}.\n"
                 "\n"
                 "For example: --format 'line: {linenumber}: message: {message}'. \n"
                 "\n"
