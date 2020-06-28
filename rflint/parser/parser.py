@@ -124,6 +124,7 @@ class RobotFile(object):
         self.path = os.path.abspath(path)
         self.tables = []
         self.rows = []
+        self.skip_lines = []
 
         try:
             self._load(path)
@@ -172,16 +173,20 @@ class RobotFile(object):
             # N.B. the caller should be catching errors
             self.raw_text = f.read()
             f.file.seek(0)
+            skip_pattern = r'# *noqa\b'
 
             matcher = Matcher(re.IGNORECASE)
             for linenumber, raw_text in enumerate(f.readlines()):
-                linenumber += 1; # start counting at 1 rather than zero
+                linenumber += 1  # start counting at 1 rather than zero
 
                 # this mimics what the robot TSV reader does --
                 # it replaces non-breaking spaces with regular spaces,
                 # and then strips trailing whitespace
                 raw_text = raw_text.replace(u'\xA0', ' ')
                 raw_text = raw_text.rstrip()
+
+                if re.search(skip_pattern, raw_text):
+                    self.skip_lines.append(linenumber)
 
                 # FIXME: I'm keeping line numbers but throwing away
                 # where each cell starts. I should be preserving that

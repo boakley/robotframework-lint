@@ -47,6 +47,7 @@ class RfLint(object):
         # mapping of class names to instances, to enable us to
         # instantiate each rule exactly once
         self._rules = {}
+        self.noqa = []
 
         for path in (builtin_rules, site_rules):
             for filename in glob.glob(path+"/*.py"):
@@ -155,6 +156,10 @@ class RfLint(object):
         self._print_filename = filename if self.args.print_filenames else None
 
         robot_file = RobotFactory(filename)
+
+        for skip_line in robot_file.skip_lines:
+            self.noqa.append({"path": robot_file.path, "line": skip_line})
+
         for rule in self.general_rules:
             if rule.severity != IGNORE:
                 rule.apply(robot_file)
@@ -194,6 +199,11 @@ class RfLint(object):
             # will get reset each time a new file is processed.
             print("+ " + self._print_filename)
             self._print_filename = None
+
+        # do not report nor add error count if line was indicated as 'noqa'
+        for noqa in self.noqa:
+            if noqa["path"] == filename and noqa["line"] == linenumber:
+                return
 
         if severity in (WARNING, ERROR):
             self.counts[severity] += 1
