@@ -173,7 +173,7 @@ class RobotFile(object):
             # N.B. the caller should be catching errors
             self.raw_text = f.read()
             f.file.seek(0)
-            skip_pattern = r'# *noqa\b'
+            skip_pattern = re.compile(r'# *noqa\b')
 
             matcher = Matcher(re.IGNORECASE)
             for linenumber, raw_text in enumerate(f.readlines()):
@@ -185,7 +185,7 @@ class RobotFile(object):
                 raw_text = raw_text.replace(u'\xA0', ' ')
                 raw_text = raw_text.rstrip()
 
-                if re.search(skip_pattern, raw_text):
+                if skip_pattern.search(raw_text):
                     self.skip_lines.append(linenumber)
 
                 # FIXME: I'm keeping line numbers but throwing away

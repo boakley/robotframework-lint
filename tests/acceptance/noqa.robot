@@ -7,7 +7,7 @@
 | Resource   | SharedKeywords.robot
 
 *** Test Cases ***
-| Run rflint and verify there are no errors or warnings
+| Run rflint and check if output contains given warnings and errors
 | | Run rf-lint with the following options:
 | | ... | test_data/acceptance/noqa.robot
 | |
