@@ -102,6 +102,13 @@ class RfLint(object):
 
         self.counts = { ERROR: 0, WARNING: 0, "other": 0}
 
+        self.filetypes = [f".{ft}" for ft in self.args.filetypes.split(',')]
+        supported_file_types = [".robot", ".resource", ".tsv", ".txt", ".rst"]
+        for ft in self.filetypes:
+            if ft not in supported_file_types:
+                sys.stderr.write(f"rflint: File extension {ft} is not supported")
+                return -1
+
         for filename in self.args.args:
             if not (os.path.exists(filename)):
                 sys.stderr.write("rflint: %s: No such file or directory\n" % filename)
@@ -109,7 +116,9 @@ class RfLint(object):
             if os.path.isdir(filename):
                 self._process_folder(filename)
             else:
-                self._process_file(filename)
+                _, ext = os.path.splitext(filename)
+                if ext.lower() in self.filetypes:
+                    self._process_file(filename)
 
         if self.counts[ERROR] > 0:
             return self.counts[ERROR] if self.counts[ERROR] < 254 else 255
@@ -143,8 +152,8 @@ class RfLint(object):
 
     def _process_files(self, folder, filenames):
         for filename in filenames:
-            name, ext = os.path.splitext(filename)
-            if ext.lower() in (".robot", ".txt", ".tsv", ".resource"):
+            _, ext = os.path.splitext(filename)
+            if ext.lower() in self.filetypes:
                 self._process_file(os.path.join(folder, filename))
 
     def _process_file(self, filename):
@@ -266,6 +275,12 @@ class RfLint(object):
                 "\n"
                 "If you give a directory as an argument, all files in the directory\n"
                 "with the suffix .txt, .robot, .resource, or .tsv will be processed. \n"
+                "You can explicitly provide file types which you want to run\n"
+                "with option --filetypes or -t. Defaults are robot and resource.\n"
+                "\n"
+                "For example: '--filetypes robot,resource' will ignore all files\n"
+                "with extensions other than .robot or .resource.\n"
+                "\n"
                 "With the --recursive option, subfolders within the directory will \n"
                 "also be processed."
                 )
@@ -286,6 +301,9 @@ class RfLint(object):
         parser.add_argument("--format", "-f",
                             help="Define the output format",
                             default='{severity}: {linenumber}, {char}: {message} ({rulename})')
+        parser.add_argument("--filetypes", "-t",
+                            help="Select file extensions to scan separated by comma",
+                            default='robot,resource')
         parser.add_argument("--version", action="store_true", default=False,
                             help="Display version number and exit")
         parser.add_argument("--verbose", "-v", action="store_true", default=False,
