@@ -113,7 +113,7 @@ class RfLint(object):
 
         if self.args.summary:
             print("----------------------------------------------------------------------",
-                  f"Found {sum([x for x in self.counts.values()])} issues: "
+                  f"Found {sum(self.counts.values())} issues: "
                   f"{self.counts['E']} ERROR(s), {self.counts['W']} WARNING(s), {self.counts['other']} other(s).",
                   sep="\n")
 
