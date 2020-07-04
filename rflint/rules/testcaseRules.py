@@ -20,12 +20,12 @@ from rflint.parser import SettingTable
 
 class PeriodInTestName(TestRule):
     '''Warn about periods in the testcase name
-    
+
     Since robot uses "." as a path separator, using a "." in a testcase
-    name can lead to ambiguity. 
+    name can lead to ambiguity.
     '''
     severity = WARNING
-    
+
     def apply(self,testcase):
         if "." in testcase.name:
             self.report(testcase, "'.' in testcase name '%s'" % testcase.name, testcase.linenumber)
@@ -35,9 +35,16 @@ class TagWithSpaces(TestRule):
     severity=ERROR
 
     def apply(self, testcase):
+        tags_with_spaces = []
         for tag in testcase.tags:
             if ((" " in tag) or ("\t" in tag)):
-                self.report(testcase, "space not allowed in tag name: '%s'" % tag, testcase.linenumber)
+                tags_with_spaces.append(tag)
+        # second loop is to discover line number of tag appearance
+        for setting in testcase.settings:
+            for cell in setting:
+                for tag_with_spaces in tags_with_spaces:
+                    if tag_with_spaces in cell:
+                        self.report(testcase, "space not allowed in tag name: '%s'" % tag_with_spaces, setting.startline)
 
 class RequireTestDocumentation(TestRule):
     '''Verify that a test suite has documentation
