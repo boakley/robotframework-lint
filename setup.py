@@ -18,7 +18,7 @@ setup(
     long_description = open('README.md').read(),
     zip_safe         = False,
     include_package_data = True,
-    install_requires = ['robotframework'],
+    install_requires = ['robotframework>=3.2.1'],
     classifiers      = [
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: Apache Software License",
