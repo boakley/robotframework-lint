@@ -43,7 +43,7 @@ class DuplicateSettingsCommon(object):
         for table in suite.tables:
             if table.name == "Settings":
                 check_duplicates(report_duplicate_setting, table,
-                    permitted_dups=["library", "resource", "variables"])
+                    permitted_dups=["library", "resource", "variables", "metadata"])
 
 class DuplicateSettingsInSuite(DuplicateSettingsCommon, SuiteRule):
     pass
