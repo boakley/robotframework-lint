@@ -8,7 +8,7 @@ class InvalidTableInResource(ResourceRule):
     default_robot_level = "robot3"
 
     def configure(self, robot_level):
-        valid_tables = ['comments?', 'settings?', 'keywords?', 'variables?']
+        valid_tables = ['comments?', 'settings?', 'keywords?', 'variables?', 'tasks?']
         if robot_level == "robot2":
             valid_tables += ['metadata', 'user keywords?']
         self.valid_tables_re = re.compile('^(' + '|'.join(valid_tables) + ')$',
