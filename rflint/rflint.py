@@ -22,7 +22,8 @@ import os
 import sys
 import glob
 import argparse
-import imp
+import importlib.machinery
+import importlib.util
 
 from .common import SuiteRule, ResourceRule, TestRule, KeywordRule, GeneralRule, Rule
 from .common import ERROR, WARNING, IGNORE
@@ -238,10 +239,18 @@ class RfLint(object):
         try:
             basename = os.path.basename(filename)
             (name, ext) = os.path.splitext(basename)
-            imp.load_source(name, filename)
+            self._load_source(name, filename)
             IMPORTED_RULE_FILES.append(abspath)
         except Exception as e:
             sys.stderr.write("rflint: %s: exception while loading: %s\n" % (filename, str(e)))
+
+    def _load_source(self, modname, filename):
+        loader = importlib.machinery.SourceFileLoader(modname, filename)
+        spec = importlib.util.spec_from_file_location(modname, filename, loader=loader)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module.__name__] = module
+        loader.exec_module(module)
+        return module
 
     def parse_and_process_args(self, args):
         """Handle the parsing of command line arguments."""
